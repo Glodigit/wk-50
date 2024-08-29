@@ -14,26 +14,26 @@ from supervisor import ticks_ms
 debug = Debug(__name__)
 
 taipo_keycodes = {
-    'TP_TLP': 0,
-    'TP_TLR': 1,
-    'TP_TLM': 2,
-    'TP_TLI': 3,
-    'TP_BLP': 4,
-    'TP_BLR': 5,
-    'TP_BLM': 6,
-    'TP_BLI': 7,
-    'TP_LIT': 8,
-    'TP_LOT': 9,
-    'TP_TRP': 10,
-    'TP_TRR': 11,
-    'TP_TRM': 12,
-    'TP_TRI': 13,
-    'TP_BRP': 14,
-    'TP_BRR': 15,
-    'TP_BRM': 16,
-    'TP_BRI': 17,
-    'TP_RIT': 18,
-    'TP_ROT': 19,
+    'TP_OL4': 0,
+    'TP_OL3': 1,
+    'TP_OL2': 2,
+    'TP_OL1': 3,
+    'TP_OL0': 4,
+    'TP_OR0': 5,
+    'TP_OR1': 6,
+    'TP_OR2': 7,
+    'TP_OR3': 8,
+    'TP_OR4': 9,
+    'TP_IL4': 10,
+    'TP_IL3': 11,
+    'TP_IL2': 12,
+    'TP_IL1': 13,
+    'TP_IL0': 14,
+    'TP_IR0': 15,
+    'TP_IR1': 16,
+    'TP_IR2': 17,
+    'TP_IR3': 18,
+    'TP_IR4': 19,
     'LAYER0': 20,
     'LAYER1': 21,
     'LAYER2': 22,
@@ -71,6 +71,7 @@ class State:
     combo = 0
     timer = 0
     key = KeyPress()
+    space = 0
 
 class TaipoMeta:
     def __init__(self, code):
