@@ -1,3 +1,5 @@
+# Based on taipo.py from github.com/dlip/chouchou
+
 try:
     from typing import Optional, Tuple, Union
 except ImportError:
