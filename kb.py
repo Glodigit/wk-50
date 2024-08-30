@@ -96,9 +96,13 @@ class POGKeyboard(KMKKeyboard):
         # Add your own modules and extensions here
         # or sort them into the correct spot to have the correct import order
 
+        # Trackball
+        from adns5050 import ADNS5050
+        keyboard.modules.append(ADNS5050(board.XY_NCS, board.XY_SCLK, board.XY_SDIO))
+
         # Taipo
-        from taipo import Taipo
-        keyboard.modules.append(Taipo())
+        #from taipo import Taipo
+        #keyboard.modules.append(Taipo())
         
         # Encoders
         if pog.hasEncoders:
