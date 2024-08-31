@@ -1,4 +1,4 @@
-# Based on KMK's adns9800.py and pimoroni_trackball.py implementations
+# Based on QMK's adns5050.c, KMK's adns9800.py and pimoroni_trackball.py implementations
 
 import time
 from micropython import const
@@ -34,8 +34,8 @@ class REG:
 
 class ADNS5050(Module):
     # Wait timings (microseconds)
-    tsww = const(30)
-    tswr = const(20)
+    #tsww = const(30)
+    #tswr = const(20)
     tsrw = tsrr = tbexit = const(1)
     tsrad = const(4)
     # SPI Settings
@@ -45,14 +45,22 @@ class ADNS5050(Module):
     DIR_WRITE = const(0x80)
     DIR_READ = const(0x7F)
 
+    # Not compatible with standard SPI bus
     def __init__(self, cs, sclk, sdio, invert_x=False, invert_y=False, north=0,):
         self.invert_x = invert_x
         self.invert_y = invert_y
         self.north = north  # Angle offset. Not yet implemented.
         
-        self.cs = digitalio.DigitalInOut(cs)
+        """ self.cs = digitalio.DigitalInOut(cs)
         self.cs.direction = digitalio.Direction.OUTPUT
-        self.spi = bitbangio.SPI(clock=sclk, MOSI=sdio, MISO=sdio)
+        self.sclk = sclk
+        self.sdio = sdio """
+        self.cs = digitalio.DigitalInOut(cs)
+        self.sclk = digitalio.DigitalInOut(sclk)
+        self.sdio = digitalio.DigitalInOut(sdio)
+        self.cs.direction = self.sclk.direction = digitalio.Direction.OUTPUT
+        self.cs.value = self.sclk.value = True
+        #self.spi = bitbangio.SPI(clock=sclk, MOSI=sdio, MISO=sdio)
 
     def twos_comp(val, bits=8):
         if (val & (1 << (bits - 1))) != 0: # if sign bit is set
@@ -64,7 +72,47 @@ class ADNS5050(Module):
 
     def adns_stop(self):
         self.cs.value = True
+
+    def adns_serial_write(self, data):
+        self.sdio.direction = digitalio.Direction.OUTPUT
+        for b in reversed(range(8)):
+            self.sclk.value = False
+            if data & (1 << b):
+                self.sdio.value = True
+            else:
+                self.sdio.value = False
+            microcontroller.delay_us(1)
+            self.sclk.value = True
+            microcontroller.delay_us(1)
+        microcontroller.delay_us(self.tsrad) # Usually the amount of time needed between operations
     
+    def adns_serial_read(self):
+        self.sdio.direction = digitalio.Direction.INPUT
+        byte = 0
+        for b in range(8):
+            self.sclk.value = False
+            microcontroller.delay_us(1)
+            byte = (byte << 1) | self.sdio.value
+            self.sclk.value = True
+            microcontroller.delay_us(1)
+        return byte
+        
+    def adns_write(self, reg, data):
+        self.adns_start()
+        self.adns_serial_write(reg | self.DIR_WRITE)
+        self.adns_serial_write(data)
+        self.adns_stop()
+
+    def adns_read(self, reg):
+        byte = 0
+        self.adns_start()
+        self.adns_serial_write(reg)
+        byte = self.adns_serial_read()
+        self.adns_stop()
+        return byte
+
+
+    '''
     def adns_write(self, reg, data):
         while not self.spi.try_lock():
             pass
@@ -108,19 +156,20 @@ class ADNS5050(Module):
         microcontroller.delay_us(self.tbexit)
         #self.adns_write(REG.Motion, 0x0) # Clear Delta_X/Y registers
         return result
+    '''
 
     def during_bootup(self, keyboard):
 
         self.adns_write(REG.Chip_Reset, 0x5A)
         time.sleep(0.1)
 
-        self.adns_read_motion()
+        #self.adns_read_motion()
 
         if keyboard.debug_enabled:
             print('ADNS: Product ID ', hex(self.adns_read(REG.Product_ID)))
-            microcontroller.delay_us(self.tsrr)
+            #microcontroller.delay_us(self.tsrr)
             print('ADNS: Revision ID ', hex(self.adns_read(REG.Revision_ID)))
-            microcontroller.delay_us(self.tsrr)
+            #microcontroller.delay_us(self.tsrr)
 
         return
 
