@@ -2,7 +2,7 @@
 
 from micropython import const
 
-import busio
+import bitbangio
 import digitalio
 import microcontroller
 
@@ -42,7 +42,7 @@ class ADNS5050(Module):
     tsrw = tsrr = tbexit = const(1)
     tsrad = const(5)
     # SPI Settings
-    baud = const(2000000)
+    baud = const(100000)
     cpol = const(1)
     cpha = const(1)
     DIR_WRITE = const(0x80)
@@ -51,7 +51,7 @@ class ADNS5050(Module):
     def __init__(self, cs, sclk, mosi, invert_x=False, invert_y=False, north=0,):
         self.cs = digitalio.DigitalInOut(cs)
         self.cs.direction = digitalio.Direction.OUTPUT
-        self.spi = busio.SPI(clock=sclk, MOSI=mosi,)
+        self.spi = bitbangio.SPI(clock=sclk, MOSI=mosi, MISO=mosi)
         self.invert_x = invert_x
         self.invert_y = invert_y
         self.north = north  # Angle offset. Not yet implemented.
@@ -84,18 +84,18 @@ class ADNS5050(Module):
             microcontroller.delay_us(self.tsrad)
             self.spi.readinto(result)
         finally:
-            self.spi.unlock()
             self.adns_stop()
+            self.spi.unlock()
 
         return result[0]
 
-    def twos_comp(self, val, bits=8):
+    def twos_comp(val, bits=8):
         if (val & (1 << (bits - 1))) != 0: # if sign bit is set
             val = val - (1 << bits)        # compute negative value
         return val                         # return positive value as is
 
     def adns_read_motion(self):
-        result = bytearray(2)
+        result = bytearray(2) # Only need to capture Delta_X/Y
         while not self.spi.try_lock():
             pass
         try:
@@ -105,8 +105,8 @@ class ADNS5050(Module):
             microcontroller.delay_us(self.tsrad)
             self.spi.readinto(result)
         finally:
-            self.spi.unlock()
             self.adns_stop()
+            self.spi.unlock()
         microcontroller.delay_us(self.tbexit)
         self.adns_write(REG.Motion, 0x0) # Clear Delta_X/Y registers
         return result
@@ -114,9 +114,11 @@ class ADNS5050(Module):
     def during_bootup(self, keyboard):
 
         self.adns_write(REG.Chip_Reset, 0x5A)
-        #time.sleep(0.1)
+        #time.sleep_us(0.1)
         microcontroller.delay_us(self.twakeup)
-        
+
+        self.adns_read_motion()
+
         if keyboard.debug_enabled:
             print('ADNS: Product ID ', hex(self.adns_read(REG.Product_ID)))
             microcontroller.delay_us(self.tsrr)
@@ -126,15 +128,16 @@ class ADNS5050(Module):
         return
 
     def before_matrix_scan(self, keyboard):
+        return
         motion = self.adns_read_motion()
         #if motion[0] & 0x80:
         delta_x = self.twos_comp(motion[0])
         delta_y = self.twos_comp(motion[1])
 
-        if keyboard.debug_enabled:
-            print('Delta: ', delta_x, ' ', delta_y)
-
         return
+        
+        if keyboard.debug_enabled & (delta_x | delta_y):
+            print('Delta: ', delta_x, ' ', delta_y)
 
         if delta_x:
             if self.invert_x:
