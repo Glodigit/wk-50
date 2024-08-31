@@ -1,7 +1,6 @@
 # Based on KMK's adns9800.py and pimoroni_trackball.py implementations
 
-# from adafruit_bus_device.spi_device import SPIDevice
-# import time
+import time
 from micropython import const
 import bitbangio
 import digitalio
@@ -35,11 +34,10 @@ class REG:
 
 class ADNS5050(Module):
     # Wait timings (microseconds)
-    twakeup = const(55)
     tsww = const(30)
     tswr = const(20)
     tsrw = tsrr = tbexit = const(1)
-    tsrad = const(10)
+    tsrad = const(4)
     # SPI Settings
     baud = const(100000)
     cpol = const(1)
@@ -55,14 +53,6 @@ class ADNS5050(Module):
         self.cs = digitalio.DigitalInOut(cs)
         self.cs.direction = digitalio.Direction.OUTPUT
         self.spi = bitbangio.SPI(clock=sclk, MOSI=sdio, MISO=sdio)
-        '''
-        self.bus = SPIDevice(
-            self.spi,  
-            baudrate=self.baud, 
-            polarity=self.cpol, 
-            phase=self.cpha,
-            )
-        '''
 
     def twos_comp(val, bits=8):
         if (val & (1 << (bits - 1))) != 0: # if sign bit is set
@@ -101,17 +91,6 @@ class ADNS5050(Module):
             self.spi.unlock()
 
         return result[0]
-                         
-    '''
-    def adns_write(self, reg, data):
-        self.bus.write(bytes([reg | self.DIR_WRITE, data]))
-
-    def adns_read(self, reg):
-        result = bytearray(1)
-        self.bus.write(bytes([reg & self.DIR_READ]))
-        microcontroller.delay_us(self.tsrad)
-        self.bus.readinto(result)
-    '''
 
     def adns_read_motion(self):
         result = bytearray(2) # Only need to capture Delta_X/Y
@@ -133,8 +112,7 @@ class ADNS5050(Module):
     def during_bootup(self, keyboard):
 
         self.adns_write(REG.Chip_Reset, 0x5A)
-        #time.sleep_us(0.1)
-        microcontroller.delay_us(self.twakeup)
+        time.sleep(0.1)
 
         self.adns_read_motion()
 
