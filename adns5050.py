@@ -1,12 +1,11 @@
 # Based on KMK's adns9800.py and pimoroni_trackball.py implementations
 
+# from adafruit_bus_device.spi_device import SPIDevice
+# import time
 from micropython import const
-
 import bitbangio
 import digitalio
 import microcontroller
-
-import time
 
 from kmk.keys import AX
 from kmk.modules import Module
@@ -40,7 +39,7 @@ class ADNS5050(Module):
     tsww = const(30)
     tswr = const(20)
     tsrw = tsrr = tbexit = const(1)
-    tsrad = const(5)
+    tsrad = const(10)
     # SPI Settings
     baud = const(100000)
     cpol = const(1)
@@ -48,20 +47,34 @@ class ADNS5050(Module):
     DIR_WRITE = const(0x80)
     DIR_READ = const(0x7F)
 
-    def __init__(self, cs, sclk, mosi, invert_x=False, invert_y=False, north=0,):
-        self.cs = digitalio.DigitalInOut(cs)
-        self.cs.direction = digitalio.Direction.OUTPUT
-        self.spi = bitbangio.SPI(clock=sclk, MOSI=mosi, MISO=mosi)
+    def __init__(self, cs, sclk, sdio, invert_x=False, invert_y=False, north=0,):
         self.invert_x = invert_x
         self.invert_y = invert_y
         self.north = north  # Angle offset. Not yet implemented.
+        
+        self.cs = digitalio.DigitalInOut(cs)
+        self.cs.direction = digitalio.Direction.OUTPUT
+        self.spi = bitbangio.SPI(clock=sclk, MOSI=sdio, MISO=sdio)
+        '''
+        self.bus = SPIDevice(
+            self.spi,  
+            baudrate=self.baud, 
+            polarity=self.cpol, 
+            phase=self.cpha,
+            )
+        '''
 
+    def twos_comp(val, bits=8):
+        if (val & (1 << (bits - 1))) != 0: # if sign bit is set
+            val = val - (1 << bits)        # compute negative value
+        return val
+    
     def adns_start(self):
         self.cs.value = False
 
     def adns_stop(self):
         self.cs.value = True
-
+    
     def adns_write(self, reg, data):
         while not self.spi.try_lock():
             pass
@@ -72,7 +85,7 @@ class ADNS5050(Module):
         finally:
             self.spi.unlock()
             self.adns_stop()
-
+    
     def adns_read(self, reg):
         result = bytearray(1)
         while not self.spi.try_lock():
@@ -88,11 +101,17 @@ class ADNS5050(Module):
             self.spi.unlock()
 
         return result[0]
+                         
+    '''
+    def adns_write(self, reg, data):
+        self.bus.write(bytes([reg | self.DIR_WRITE, data]))
 
-    def twos_comp(val, bits=8):
-        if (val & (1 << (bits - 1))) != 0: # if sign bit is set
-            val = val - (1 << bits)        # compute negative value
-        return val                         # return positive value as is
+    def adns_read(self, reg):
+        result = bytearray(1)
+        self.bus.write(bytes([reg & self.DIR_READ]))
+        microcontroller.delay_us(self.tsrad)
+        self.bus.readinto(result)
+    '''
 
     def adns_read_motion(self):
         result = bytearray(2) # Only need to capture Delta_X/Y
@@ -108,7 +127,7 @@ class ADNS5050(Module):
             self.adns_stop()
             self.spi.unlock()
         microcontroller.delay_us(self.tbexit)
-        self.adns_write(REG.Motion, 0x0) # Clear Delta_X/Y registers
+        #self.adns_write(REG.Motion, 0x0) # Clear Delta_X/Y registers
         return result
 
     def during_bootup(self, keyboard):
