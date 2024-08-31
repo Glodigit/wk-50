@@ -40,7 +40,7 @@ class ADNS5050(Module):
     def __init__(self, ncs, clk, dio, invert_x=True, invert_y=True, north=0,):
         self.invert_x = invert_x
         self.invert_y = invert_y
-        self.north = north  # Angle offset. Not yet implemented.
+        self.north = north # degrees
         
         self.ncs = digitalio.DigitalInOut(ncs)
         self.clk = digitalio.DigitalInOut(clk)
@@ -115,15 +115,13 @@ class ADNS5050(Module):
     def set_cpi(self, cpi_mode=7): # Default - 1000 CPI
         cpi = range(1, 12)
         self.adns_write(REG.Mouse_Control2, cpi[cpi_mode] | 0x10)
-        
-    def set_north_offset(self, offset):
-        return
     
     def during_bootup(self, keyboard):
         self.adns_write(REG.Chip_Reset, 0x5A)
         time.sleep(0.1) # Datasheet minimum is 0.055
         self.set_cpi()
-        self.adns_write(REG.LED_DC_Mode, 1<<7) # Disable LED dimming slightly when inactive
+        # Disable LED dimming slightly when inactive. Can cause mouse to jiggle +/- 1px.
+        self.adns_write(REG.LED_DC_Mode, 1<<7) 
 
         if keyboard.debug_enabled:
             # Product ID should read 0x12
@@ -138,7 +136,12 @@ class ADNS5050(Module):
         motion = self.get_motion()
         delta_x = self.twos_comp(motion[0])
         delta_y = self.twos_comp(motion[1])
-               
+
+        if self.north: # Apply north correction
+            delta_xy = complex(delta_x, delta_y) * 1j**(self.north/90)
+            delta_x = round(delta_xy.real)
+            delta_y = round(delta_xy.imag)
+        
         if delta_x:
             if self.invert_x:
                 delta_x *= -1
