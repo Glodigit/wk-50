@@ -107,6 +107,7 @@ class ADNS5050(Module):
         self.adns_stop() # Cancel rest of burst output
         return motion
     
+    
     def get_cpi(self):
         cpi = self.adns_read(REG.Mouse_Control2)
         return (cpi & 0xF) * 125
@@ -115,6 +116,44 @@ class ADNS5050(Module):
     def set_cpi(self, cpi_mode=7): # Default - 1000 CPI
         cpi = range(1, 12)
         self.adns_write(REG.Mouse_Control2, cpi[cpi_mode] | 0x10)
+
+    
+    # Deadzone correction codes based on https://github.com/Minimuino/thumbstick-deadzones
+    def map_range(self, value, old_min, old_max=255, new_min=0, new_max=255):
+        return (new_min + (new_max - new_min) * (value - old_min) / (old_max - old_min))
+    
+    def get_sign(self, val):
+        return 1 if val > 0 else 0 if val == 0 else -1
+    
+    def dz_scaled_radial(self, xy:complex, deadzone):
+        input_magnitude = abs(xy)
+        if input_magnitude < deadzone:
+            return 0 + 0j
+        else:
+            input_normalized = xy / input_magnitude
+            result = input_normalized * self.map_range(input_magnitude, deadzone)
+            return result
+        
+    def dz_sloped_scaled_axial(self, xy:complex, deadzone):
+        mag_x = abs(xy.real)
+        mag_y = abs(xy.imag)
+        deadzone_x = deadzone * mag_y
+        deadzone_y = deadzone * mag_x
+        result = 0 + 0j
+        sign = complex(self.get_sign(xy.real), self.get_sign(xy.imag))
+        if (mag_x > deadzone_x):
+            result += sign.real * self.map_range(mag_x, deadzone_x)
+        if (mag_y > deadzone_y):
+            result += 1j * sign.imag * self.map_range(mag_y, deadzone_y)
+        return result
+    
+    def dz_hybrid(self, xy:complex, deadzone):
+        if abs(xy) < deadzone:
+            return 0 + 0j
+        return self.dz_sloped_scaled_axial(
+            self.dz_scaled_radial(xy, deadzone), 
+            deadzone)
+
     
     def during_bootup(self, keyboard):
         self.adns_write(REG.Chip_Reset, 0x5A)
@@ -136,12 +175,17 @@ class ADNS5050(Module):
         motion = self.get_motion()
         delta_x = self.twos_comp(motion[0])
         delta_y = self.twos_comp(motion[1])
+        delta_xy = 0 + 0j
 
-        if self.north: # Apply north correction
+        if self.north:                          # Apply north correction
             delta_xy = complex(delta_x, delta_y) * 1j**(self.north/90)
-            delta_x = round(delta_xy.real)
-            delta_y = round(delta_xy.imag)
-        
+            
+        #delta_xy = self.dz_scaled_radial(delta_xy, 1)  # Apply deadzone correction
+
+        # Convert back to integers
+        delta_x = round(delta_xy.real)
+        delta_y = round(delta_xy.imag)
+
         if delta_x:
             if self.invert_x:
                 delta_x *= -1
