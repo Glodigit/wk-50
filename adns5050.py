@@ -1,8 +1,7 @@
-# Based on QMK's adns5050.c, KMK's adns9800.py and pimoroni_trackball.py implementations
+# Based on QMK's adns5050.c and KMK's adns9800.py implementations
 
 import time
 from micropython import const
-import bitbangio
 import digitalio
 import microcontroller
 
@@ -10,8 +9,8 @@ from kmk.keys import AX
 from kmk.modules import Module
 
 
-class REG:
-    Product_ID = const(0x0)
+class REG: # Only 5 of these registers are used
+    Product_ID = const(0x0) 
     Revision_ID = const(0x1)
     Motion = const(0x2)
     Delta_X = const(0x3)
@@ -33,67 +32,55 @@ class REG:
 
 
 class ADNS5050(Module):
-    # Wait timings (microseconds)
-    #tsww = const(30)
-    #tswr = const(20)
-    tsrw = tsrr = tbexit = const(1)
-    tsrad = const(4)
-    # SPI Settings
-    baud = const(100000)
-    cpol = const(1)
-    cpha = const(1)
+    tsrad = const(4) # Wait timings (microseconds)
     DIR_WRITE = const(0x80)
     DIR_READ = const(0x7F)
 
-    # Not compatible with standard SPI bus
-    def __init__(self, cs, sclk, sdio, invert_x=False, invert_y=False, north=0,):
+    # Not compatible with standard SPI bus, so slightly different names used
+    def __init__(self, ncs, clk, dio, invert_x=True, invert_y=True, north=0,):
         self.invert_x = invert_x
         self.invert_y = invert_y
         self.north = north  # Angle offset. Not yet implemented.
         
-        """ self.cs = digitalio.DigitalInOut(cs)
-        self.cs.direction = digitalio.Direction.OUTPUT
-        self.sclk = sclk
-        self.sdio = sdio """
-        self.cs = digitalio.DigitalInOut(cs)
-        self.sclk = digitalio.DigitalInOut(sclk)
-        self.sdio = digitalio.DigitalInOut(sdio)
-        self.cs.direction = self.sclk.direction = digitalio.Direction.OUTPUT
-        self.cs.value = self.sclk.value = True
-        #self.spi = bitbangio.SPI(clock=sclk, MOSI=sdio, MISO=sdio)
+        self.ncs = digitalio.DigitalInOut(ncs)
+        self.clk = digitalio.DigitalInOut(clk)
+        self.dio = digitalio.DigitalInOut(dio)
+        self.ncs.direction = self.clk.direction = digitalio.Direction.OUTPUT
+        self.ncs.value = self.clk.value = True
 
-    def twos_comp(val, bits=8):
-        if (val & (1 << (bits - 1))) != 0: # if sign bit is set
-            val = val - (1 << bits)        # compute negative value
-        return val
+    def twos_comp(self, data):
+        if (data & 0x80) == 0x80:
+            return -128 + (data & 0x7F)
+        else:
+            return data
     
     def adns_start(self):
-        self.cs.value = False
+        self.ncs.value = False
 
     def adns_stop(self):
-        self.cs.value = True
+        self.ncs.value = True
 
     def adns_serial_write(self, data):
-        self.sdio.direction = digitalio.Direction.OUTPUT
+        self.dio.direction = digitalio.Direction.OUTPUT
         for b in reversed(range(8)):
-            self.sclk.value = False
+            self.clk.value = False
             if data & (1 << b):
-                self.sdio.value = True
+                self.dio.value = True
             else:
-                self.sdio.value = False
+                self.dio.value = False
             microcontroller.delay_us(1)
-            self.sclk.value = True
+            self.clk.value = True
             microcontroller.delay_us(1)
         microcontroller.delay_us(self.tsrad) # Usually the amount of time needed between operations
     
     def adns_serial_read(self):
-        self.sdio.direction = digitalio.Direction.INPUT
+        self.dio.direction = digitalio.Direction.INPUT
         byte = 0
         for b in range(8):
-            self.sclk.value = False
+            self.clk.value = False
             microcontroller.delay_us(1)
-            byte = (byte << 1) | self.sdio.value
-            self.sclk.value = True
+            byte = (byte << 1) | self.dio.value
+            self.clk.value = True
             microcontroller.delay_us(1)
         return byte
         
@@ -106,85 +93,52 @@ class ADNS5050(Module):
     def adns_read(self, reg):
         byte = 0
         self.adns_start()
-        self.adns_serial_write(reg)
+        self.adns_serial_write(reg & self.DIR_READ)
         byte = self.adns_serial_read()
         self.adns_stop()
         return byte
 
-
-    '''
-    def adns_write(self, reg, data):
-        while not self.spi.try_lock():
-            pass
-        try:
-            self.spi.configure(baudrate=self.baud, polarity=self.cpol, phase=self.cpha)
-            self.adns_start()
-            self.spi.write(bytes([reg | self.DIR_WRITE, data]))
-        finally:
-            self.spi.unlock()
-            self.adns_stop()
+    def get_motion(self):
+        motion = [0, 0]
+        self.adns_start()
+        self.adns_serial_write(REG.Motion_Burst & self.DIR_READ)
+        motion[0] = self.adns_serial_read()
+        motion[1] = self.adns_serial_read()
+        self.adns_stop() # Cancel rest of burst output
+        return motion
     
-    def adns_read(self, reg):
-        result = bytearray(1)
-        while not self.spi.try_lock():
-            pass
-        try:
-            self.spi.configure(baudrate=self.baud, polarity=self.cpol, phase=self.cpha)
-            self.adns_start()
-            self.spi.write(bytes([reg & self.DIR_READ]))
-            microcontroller.delay_us(self.tsrad)
-            self.spi.readinto(result)
-        finally:
-            self.adns_stop()
-            self.spi.unlock()
-
-        return result[0]
-
-    def adns_read_motion(self):
-        result = bytearray(2) # Only need to capture Delta_X/Y
-        while not self.spi.try_lock():
-            pass
-        try:
-            self.spi.configure(baudrate=self.baud, polarity=self.cpol, phase=self.cpha)
-            self.adns_start()
-            self.spi.write(bytes([REG.Motion_Burst & self.DIR_READ]))
-            microcontroller.delay_us(self.tsrad)
-            self.spi.readinto(result)
-        finally:
-            self.adns_stop()
-            self.spi.unlock()
-        microcontroller.delay_us(self.tbexit)
-        #self.adns_write(REG.Motion, 0x0) # Clear Delta_X/Y registers
-        return result
-    '''
-
+    def get_cpi(self):
+        cpi = self.adns_read(REG.Mouse_Control2)
+        return (cpi & 0xF) * 125
+    
+    # Accepts values from 0 to 10 inclusive
+    def set_cpi(self, cpi_mode=7): # Default - 1000 CPI
+        cpi = range(1, 12)
+        self.adns_write(REG.Mouse_Control2, cpi[cpi_mode] | 0x10)
+        
+    def set_north_offset(self, offset):
+        return
+    
     def during_bootup(self, keyboard):
-
         self.adns_write(REG.Chip_Reset, 0x5A)
-        time.sleep(0.1)
-
-        #self.adns_read_motion()
+        time.sleep(0.1) # Datasheet minimum is 0.055
+        self.set_cpi()
+        self.adns_write(REG.LED_DC_Mode, 1<<7) # Disable LED dimming slightly when inactive
 
         if keyboard.debug_enabled:
-            print('ADNS: Product ID ', hex(self.adns_read(REG.Product_ID)))
-            #microcontroller.delay_us(self.tsrr)
-            print('ADNS: Revision ID ', hex(self.adns_read(REG.Revision_ID)))
-            #microcontroller.delay_us(self.tsrr)
+            # Product ID should read 0x12
+            print('ADNS:   Product ID ', hex(self.adns_read(REG.Product_ID)))
+            print('ADNS:  Revision ID ', hex(self.adns_read(REG.Revision_ID)))
+            print('ADNS: MouseControl ', '2' if self.adns_read(REG.Mouse_Control2) & (1<<4) else '1')
+            print('ADNS: Control2 CPI ', self.get_cpi())
 
         return
 
     def before_matrix_scan(self, keyboard):
-        return
-        motion = self.adns_read_motion()
-        #if motion[0] & 0x80:
+        motion = self.get_motion()
         delta_x = self.twos_comp(motion[0])
         delta_y = self.twos_comp(motion[1])
-
-        return
-        
-        if keyboard.debug_enabled & (delta_x | delta_y):
-            print('Delta: ', delta_x, ' ', delta_y)
-
+               
         if delta_x:
             if self.invert_x:
                 delta_x *= -1
@@ -194,7 +148,9 @@ class ADNS5050(Module):
             if self.invert_y:
                 delta_y *= -1
             AX.Y.move(keyboard, delta_y)
-
+        
+        if keyboard.debug_enabled & (delta_x | delta_y):
+            print('Delta: ', delta_x, ' ', delta_y)
         
 
     def after_matrix_scan(self, keyboard):
@@ -207,14 +163,8 @@ class ADNS5050(Module):
         return
 
     def on_powersave_enable(self, keyboard):
+        # could write bit to mousecontrol register 
         return
 
     def on_powersave_disable(self, keyboard):
-        return
-    
-    def adns_get_cpi(self, keyboard):
-        return
-    def adns_set_cpi(self, keyboard):
-        return
-    def adns_set_north_offset(self, keyboard):
         return
