@@ -37,9 +37,10 @@ class ADNS5050(Module):
     DIR_READ = const(0x7F)
 
     # Not compatible with standard SPI bus, so slightly different names used
-    def __init__(self, ncs, clk, dio, invert_x=True, invert_y=True, north=0,):
+    def __init__(self, ncs, clk, dio, dimLED=False, invert_x=True, invert_y=True, north=0,):
         self.invert_x = invert_x
         self.invert_y = invert_y
+        self.dimLED = dimLED
         self.north = north # degrees
         
         self.ncs = digitalio.DigitalInOut(ncs)
@@ -123,11 +124,12 @@ class ADNS5050(Module):
         time.sleep(0.1) # Datasheet minimum is 0.055
         self.set_cpi()
         
-        # Disable LED dimming slightly when inactive. Can cause mouse to jiggle +/- 1px.
-        self.adns_write(REG.LED_DC_Mode, 1<<7) 
+        # Disables LED dimming slightly when inactive. Can cause mouse to jiggle +/- 1px.
+        if not self.dimLED:
+            self.adns_write(REG.LED_DC_Mode, 1<<7) 
 
         if keyboard.debug_enabled:
-            # Product ID should read 0x12
+            # Product / Revision ID should read 0x12 / 0x01
             print('ADNS:   Product ID ', hex(self.adns_read(REG.Product_ID)))
             print('ADNS:  Revision ID ', hex(self.adns_read(REG.Revision_ID)))
             print('ADNS: MouseControl ', '2' if self.adns_read(REG.Mouse_Control2) & (1<<4) else '1')
@@ -136,11 +138,13 @@ class ADNS5050(Module):
         return
 
     def before_matrix_scan(self, keyboard):
+        if not self.adns_read(REG.Motion) >> 7:
+            return
         motion = self.get_motion()
         delta_x = self.twos_comp(motion[0])
         delta_y = self.twos_comp(motion[1])
 
-        if self.north:                          # Apply north correction
+        if self.north: # Apply north correction
             delta_xy = complex(delta_x, delta_y) * 1j**(self.north/90)
             delta_x = round(delta_xy.real)
             delta_y = round(delta_xy.imag) 
