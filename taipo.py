@@ -53,16 +53,16 @@ taipo_keycodes = {
     'MOD_GACS': 34,
 };
 
-o0 = 1 << 0
+o4 = 1 << 0
 o3 = 1 << 1
 o2 = 1 << 2
 o1 = 1 << 3
-o4 = 1 << 4
-i0 = 1 << 5
+o0 = 1 << 4
+i4 = 1 << 5
 i3 = 1 << 6
 i2 = 1 << 7
 i1 = 1 << 8
-i4 = 1 << 9
+i0 = 1 << 9
 
 class KeyPress:
     keycode = KC.NO
