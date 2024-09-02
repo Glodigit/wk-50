@@ -154,17 +154,17 @@ class Taipo(Module):
             o2 | o3 | i4 : KC.MACRO("p "),
             o2 | o3 | o4 | i4 : KC.NO,
 
-            # ⬦⬘⬦⬘⬦ ┊F┊
+            # ⬦⬘⬦⬘⬦ ┊F┊ ┊find┊
             o1 | o3 : KC.F,
             o1 | o3 | o4 : KC.LSFT(KC.F),
             o1 | o3 | i4 : KC.MACRO("f "),
-            o1 | o3 | o4 | i4 : KC.NO,
+            o1 | o3 | o4 | i4 : KC.LCTL(KC.F),
 
-            # ⬦⬘⬦⬦⬗ ┊B┊
+            # ⬦⬘⬦⬦⬗ ┊B┊ ┊select all┊
             o3 | o0 : KC.B,
             o3 | o0 | o4 : KC.LSFT(KC.B),
             o3 | o0 | i4 : KC.MACRO("b "),
-            o3 | o0 | o4 | i4 : KC.NO,
+            o3 | o0 | o4 | i4 : KC.LCTL(KC.A), # mnemonic: blue all
 
             # ⬦⬙⬙⬦⬦ ┊U┊
             i2 | i3 : KC.U,
@@ -178,11 +178,11 @@ class Taipo(Module):
             i1 | i3 | i4 : KC.MACRO("r "),
             i1 | i3 | o4 | i4 : KC.LCTL(KC.C),
             
-            # ⬦⬙⬦⬦⬖ ┊L┊ ┊select all┊
+            # ⬦⬙⬦⬦⬖ ┊L┊
             i3 | i0 : KC.L,
             i3 | i0 | o4 : KC.LSFT(KC.L),
             i3 | i0 | i4 : KC.MACRO("l "),
-            i3 | i0 | o4 | i4 : KC.LCTL(KC.A),
+            i3 | i0 | o4 | i4 : KC.NO,
 
             # ⬦⬦⬘⬘⬦ ┊G┊
             o1 | o2 : KC.G,
@@ -214,11 +214,11 @@ class Taipo(Module):
             o1 | o0 | i4 : KC.MACRO("y "),
             o1 | o0 | o4 | i4 : KC.LCTL(KC.Y),
 
-            # ⬦⬦⬦⬙⬖ ┊D┊
+            # ⬦⬦⬦⬙⬖ ┊D┊ ┊onenote find┊
             i1 | i0 : KC.D,
             i1 | i0 | o4 : KC.LSFT(KC.D),
             i1 | i0 | i4 : KC.MACRO("d "),
-            i1 | i0 | o4 | i4 : KC.AT,
+            i1 | i0 | o4 | i4 : KC.LCTL(KC.E),
 
             # ⬦⬘⬙⬦⬦ ┊|┊ ┊/┊ ┊\┊ ┊%┊
             i2 | o3 : KC.PIPE,
@@ -292,11 +292,11 @@ class Taipo(Module):
             i1 | o0 | i4 : KC.MACRO("m "),
             i1 | o0 | o4 | i4 : KC.NO,
 
-            # ⬦⬘⬘⬘⬦ ┊tab┊ ┊none┊ ┊shift+tab┊
+            # ⬦⬘⬘⬘⬦ ┊tab┊ ┊shift+tab┊ ┊alt+tab┊ ┊gui+tab┊
             o1 | o2 | o3: KC.TAB,
-            o1 | o2 | o3 | o4 : KC.NO,
-            o1 | o2 | o3 | i4 : KC.LSFT(KC.TAB),
-            o1 | o2 | o3 | o4 | i4 : KC.NO,
+            o1 | o2 | o3 | o4 : KC.LSFT(KC.TAB),
+            o1 | o2 | o3 | i4 : KC.LALT(KC.TAB),
+            o1 | o2 | o3 | o4 | i4 : KC.LGUI(KC.TAB),
 
             # ⬦⬘⬘⬦⬗
 
@@ -345,7 +345,8 @@ class Taipo(Module):
             # ⬦⬦⬙⬘⬖ ┊printscreen┊
             i0 | o1 | i2 : KC.PSCREEN,
 
-            # ⬦⬘⬘⬙⬦ 
+            # ⬦⬘⬘⬙⬦ ┊explorer┊
+            i1 | o2 | o3 : KC.LGUI(KC.E),
 
             # ⬦⬘⬘⬦⬖
 
