@@ -15,6 +15,8 @@ from kmk.modules import Module
 from kmk.utils import Debug
 from supervisor import ticks_ms
 
+from customkeys import toggle_drive
+
 debug = Debug(__name__)
 
 taipo_keycodes = {
@@ -349,7 +351,8 @@ class Taipo(Module):
             # ⬦⬘⬘⬙⬦ ┊explorer┊
             i1 | o2 | o3 : KC.LGUI(KC.E),
 
-            # ⬦⬘⬘⬦⬖
+            # ⬦⬘⬘⬦⬖ ┊circuitpy visible┊
+            i0 | o2 | o3 : KC.MACRO(toggle_drive),
 
             # ⬦⬘⬦⬘⬖
 
