@@ -63,6 +63,16 @@ i3 = 1 << 6
 i2 = 1 << 7
 i1 = 1 << 8
 i0 = 1 << 9
+◇◇◇◇◇◇◇◇◇
+◆◆◆◆◆◆◆◆◆
+⬥⬥⬥⬥⬥⬥⬥⬥⬥
+⬦⬦⬦⬦⬦⬦⬦⬦⬦
+⬖⬖⬖⬖⬖⬖⬖⬖⬖
+⬗⬗⬗⬗⬗⬗⬗⬗⬗
+⬘⬘⬘⬘⬘⬘⬘⬘⬘
+⬙⬙⬙⬙⬙⬙⬙⬙⬙
+⯁⯁⯁⯁⯁⯁⯁⯁⯁
+🞚🞚🞚🞚🞚🞚🞚🞚🞚
 
 class KeyPress:
     keycode = KC.NO
@@ -89,10 +99,7 @@ class Taipo(Module):
         self.keymap = {                         # Finger: 4 3 2 1 0 
             i4: KC.SPC,                                 # ⬗◇◇◇◇
             o4: KC.BSPC,                                # ⬖◇◇◇◇
-            o0: KC.R,                                   # ◇◇◇◇⬗
-            o0 | o4: KC.LSFT(KC.R),                     # ⬖◇◇◇⬗
-            o0 | i4: KC.MACRO("r "),                    # ⬗◇◇◇⬗
-            o0 | o4 | i4: KC.RABK,                      # ◆◇◇◇⬗
+            o4 | i4: KC.NO,                             # ◆◇◇◇◇            
             o3: KC.S,                                   # 
             o3 | o4: KC.LSFT(KC.S),                     # 
             o3 | i4: KC.RCBR,   
@@ -104,11 +111,11 @@ class Taipo(Module):
             o1: KC.I,   
             o1 | o4: KC.LSFT(KC.I), 
             o1 | i4: KC.RPRN,   
-            o1 | o4 | i4: KC.MEDIA_PLAY_PAUSE,  
-            i0: KC.A,   
-            i0 | o4: KC.LSFT(KC.A), 
-            i0 | i4: KC.LABK,   
-            i0 | o4 | i4: KC.MEDIA_NEXT_TRACK,  
+            o1 | o4 | i4: KC.MEDIA_PLAY_PAUSE,
+            o0: KC.R,                                   # ◇◇◇◇⬗
+            o0 | o4: KC.LSFT(KC.R),                     # ⬖◇◇◇⬗
+            o0 | i4: KC.MACRO("r "),                    # ⬗◇◇◇⬗
+            o0 | o4 | i4: KC.RABK,                      # ◆◇◇◇⬗             
             i3: KC.O,   
             i3 | o4: KC.LSFT(KC.O), 
             i3 | i4: KC.LCBR,   
@@ -121,6 +128,10 @@ class Taipo(Module):
             i1 | o4: KC.LSFT(KC.E),
             i1 | i4: KC.LPRN,
             i1 | o4 | i4: KC.MEDIA_PREV_TRACK,
+            i0: KC.A,   
+            i0 | o4: KC.LSFT(KC.A), 
+            i0 | i4: KC.LABK,   
+            i0 | o4 | i4: KC.MEDIA_NEXT_TRACK,
             i1 | i3: KC.C,
             i1 | i3 | o4: KC.LSFT(KC.C),
             i1 | i3 | i4: KC.N1,
