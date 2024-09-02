@@ -1,4 +1,6 @@
 # Based on taipo.py from github.com/dlip/chouchou
+# SPDX-FileCopyrightText: © 2023 Dane Lipscombe @dlip
+# SPDX-FileCopyrightText: © 2024 Kelvin Afolabi @glodigit
 
 try:
     from typing import Optional, Tuple, Union
@@ -63,16 +65,7 @@ i3 = 1 << 6
 i2 = 1 << 7
 i1 = 1 << 8
 i0 = 1 << 9
-◇◇◇◇◇◇◇◇◇
-◆◆◆◆◆◆◆◆◆
-⬥⬥⬥⬥⬥⬥⬥⬥⬥
-⬦⬦⬦⬦⬦⬦⬦⬦⬦
-⬖⬖⬖⬖⬖⬖⬖⬖⬖
-⬗⬗⬗⬗⬗⬗⬗⬗⬗
-⬘⬘⬘⬘⬘⬘⬘⬘⬘
-⬙⬙⬙⬙⬙⬙⬙⬙⬙
-⯁⯁⯁⯁⯁⯁⯁⯁⯁
-🞚🞚🞚🞚🞚🞚🞚🞚🞚
+
 
 class KeyPress:
     keycode = KC.NO
@@ -96,170 +89,344 @@ class Taipo(Module):
         for key, code in taipo_keycodes.items():
             make_key( names=(key,), meta=TaipoMeta(code))
 
-        self.keymap = {                         # Finger: 4 3 2 1 0 
-            i4: KC.SPC,                                 # ⬗◇◇◇◇
-            o4: KC.BSPC,                                # ⬖◇◇◇◇
-            o4 | i4: KC.NO,                             # ◆◇◇◇◇            
-            o3: KC.S,                                   # 
-            o3 | o4: KC.LSFT(KC.S),                     # 
-            o3 | i4: KC.RCBR,   
-            o3 | o4 | i4: KC.BRIGHTNESS_UP, 
-            o2: KC.N,   
-            o2 | o4: KC.LSFT(KC.N), 
-            o2 | i4: KC.RBRC,   
-            o2 | o4 | i4: KC.BRIGHTNESS_DOWN,   
-            o1: KC.I,   
-            o1 | o4: KC.LSFT(KC.I), 
-            o1 | i4: KC.RPRN,   
-            o1 | o4 | i4: KC.MEDIA_PLAY_PAUSE,
-            o0: KC.R,                                   # ◇◇◇◇⬗
-            o0 | o4: KC.LSFT(KC.R),                     # ⬖◇◇◇⬗
-            o0 | i4: KC.MACRO("r "),                    # ⬗◇◇◇⬗
-            o0 | o4 | i4: KC.RABK,                      # ◆◇◇◇⬗             
-            i3: KC.O,   
-            i3 | o4: KC.LSFT(KC.O), 
-            i3 | i4: KC.LCBR,   
-            i3 | o4 | i4: KC.AUDIO_VOL_UP,  
-            i2: KC.E,
-            i2 | o4: KC.LSFT(KC.T),
-            i2 | i4: KC.LBRC,
-            i2 | o4 | i4: KC.AUDIO_VOL_DOWN,
-            i1: KC.T,
-            i1 | o4: KC.LSFT(KC.E),
-            i1 | i4: KC.LPRN,
-            i1 | o4 | i4: KC.MEDIA_PREV_TRACK,
-            i0: KC.A,   
-            i0 | o4: KC.LSFT(KC.A), 
-            i0 | i4: KC.LABK,   
-            i0 | o4 | i4: KC.MEDIA_NEXT_TRACK,
-            i1 | i3: KC.C,
-            i1 | i3 | o4: KC.LSFT(KC.C),
-            i1 | i3 | i4: KC.N1,
-            i1 | i3 | o4 | i4: KC.F1,
-            i2 | i3: KC.U,
-            i2 | i3 | o4: KC.LSFT(KC.U),
-            i2 | i3 | i4: KC.N2,
-            i2 | i3 | o4 | i4: KC.F2,
-            i2 | i0: KC.Q,
-            i2 | i0 | o4: KC.LSFT(KC.Q),
-            i2 | i0 | i4: KC.N3,
-            i2 | i0 | o4 | i4: KC.F3,
-            i3 | i0: KC.L,
-            i3 | i0 | o4: KC.LSFT(KC.L),
-            i3 | i0 | i4: KC.N4,
-            i3 | i0 | o4 | i4: KC.F4,
-            o1 | o2: KC.Y,
-            o1 | o2 | o4: KC.LSFT(KC.Y),
-            o1 | o2 | i4: KC.N5,
-            o1 | o2 | o4 | i4: KC.F5,
-            o1 | o3: KC.F,
-            o1 | o3 | o4: KC.LSFT(KC.F),
-            o1 | o3 | i4: KC.N6,
-            o1 | o3 | o4 | i4: KC.F6,
-            o2 | o3: KC.P,
-            o2 | o3 | o4: KC.LSFT(KC.P),
-            o2 | o3 | i4: KC.N7,
-            o2 | o3 | o4 | i4: KC.F7,
-            o2 | o0: KC.Z,
-            o2 | o0 | o4: KC.LSFT(KC.Z),
-            o2 | o0 | i4: KC.N8,
-            o2 | o0 | o4 | i4: KC.F8,
-            o3 | o0: KC.B,
-            o3 | o0 | o4: KC.LSFT(KC.B),
-            o3 | o0 | i4: KC.N9,
-            o3 | o0 | o4 | i4: KC.F9,
-            i1 | i2: KC.H,
-            i1 | i2 | o4: KC.LSFT(KC.H),
-            i1 | i2 | i4: KC.N0,
-            i1 | i2 | o4 | i4: KC.F10,
-            i1 | i0: KC.D,
-            i1 | i0 | o4: KC.LSFT(KC.D),
-            i1 | i0 | i4: KC.AT,
-            i1 | i0 | o4 | i4: KC.F11,
-            o1 | o0: KC.G,
-            o1 | o0 | o4: KC.LSFT(KC.G),
-            o1 | o0 | i4: KC.HASH,
-            o1 | o0 | o4 | i4: KC.F12,
-            i2 | o0: KC.X,
-            i2 | o0 | o4: KC.LSFT(KC.X),
-            i2 | o0 | i4: KC.CIRC,
-            i2 | o0 | o4 | i4: KC.LCTL(KC.X),
-            o1 | i3: KC.K,
-            o1 | i3 | o4: KC.LSFT(KC.K),
-            o1 | i3 | i4: KC.PLUS,
-            o1 | i3 | o4 | i4: KC.LCTL(KC.C),
-            i1 | o3: KC.V,
-            i1 | o3 | o4: KC.LSFT(KC.V),
-            i1 | o3 | i4: KC.ASTR,
-            i1 | o3 | o4 | i4: KC.LCTL(KC.V),
-            o2 | i0: KC.J,
-            o2 | i0 | o4: KC.LSFT(KC.J),
-            o2 | i0 | i4: KC.EQL,
-            o2 | i0 | o4 | i4: KC.LCTL(KC.Z),
-            i1 | o0: KC.M,
-            i1 | o0 | o4: KC.LSFT(KC.M),
-            i1 | o0 | i4: KC.DLR,
-            i1 | o0 | o4 | i4: KC.NO,
+        # Outer Finger 4---0: ⬖⬘⬘⬘⬗
+        self.keymap = {
+            # ⬖⬦⬦⬦⬦ ┊backspace┊
+            o4 : KC.BSPC,
+
+            # ⬗⬦⬦⬦⬦ ┊space┊
+            i4 : KC.SPC,
+
+            # ◆⬦⬦⬦⬦
+            o4 | i4 : KC.NO,
+
+            # ⬦⬘⬦⬦⬦ ┊A┊ ┊}┊
+            o3 : KC.A,
+            o3 | o4 : KC.LSFT(KC.A),
+            o3 | i4 : KC.MACRO("a "),
+            o3 | o4 | i4 : KC.RCBR,
+
+            # ⬦⬦⬘⬦⬦ ┊N┊ ┊]┊
+            o2 : KC.N,   
+            o2 | o4 : KC.LSFT(KC.N),
+            o2 | i4 : KC.MACRO("n "),
+            o2 | o4 | i4 : KC.RBRC,
+
+            # ⬦⬦⬦⬘⬦ ┊I┊ ┊)┊
+            o1 : KC.I,   
+            o1 | o4 : KC.LSFT(KC.I),
+            o1 | i4 : KC.MACRO("i "),
+            o1 | o4 | i4 : KC.RPRN,
+
+            # ⬦⬦⬦⬦⬗ ┊S┊ ┊>┊
+            o0 : KC.S,
+            o0 | o4 : KC.LSFT(KC.S),
+            o0 | i4 : KC.MACRO("s "),
+            o0 | o4 | i4 : KC.RABK,
+
+            # ⬦⬙⬦⬦⬦ ┊O┊ ┊{┊
+            i3 : KC.O,   
+            i3 | o4 : KC.LSFT(KC.O), 
+            i3 | i4 : KC.MACRO("o "),   
+            i3 | o4 | i4 : KC.LCBR,
+
+            # ⬦⬦⬙⬦⬦ ┊T┊ ┊[┊
+            i2 : KC.T,
+            i2 | o4 : KC.LSFT(KC.T),
+            i2 | i4 : KC.MACRO("t "),
+            i2 | o4 | i4 : KC.LBRC,
+
+            # ⬦⬦⬦⬙⬦ ┊E┊ ┊(┊
+            i1 : KC.E,
+            i1 | o4 : KC.LSFT(KC.E),
+            i1 | i4 : KC.MACRO("e "),
+            i1 | o4 | i4 : KC.LPRN,
+
+            # ⬦⬦⬦⬦⬖ ┊R┊ ┊<┊
+            i0 : KC.R,   
+            i0 | o4 : KC.LSFT(KC.R), 
+            i0 | i4 : KC.MACRO("r "),
+            i0 | o4 | i4 : KC.LABK,
+
+            # ⬦⬘⬘⬦⬦ ┊P┊
+            o2 | o3 : KC.P,
+            o2 | o3 | o4 : KC.LSFT(KC.P),
+            o2 | o3 | i4 : KC.MACRO("p "),
+            o2 | o3 | o4 | i4 : KC.NO,
+
+            # ⬦⬘⬦⬘⬦ ┊F┊
+            o1 | o3 : KC.F,
+            o1 | o3 | o4 : KC.LSFT(KC.F),
+            o1 | o3 | i4 : KC.MACRO("f "),
+            o1 | o3 | o4 | i4 : KC.NO,
+
+            # ⬦⬘⬦⬦⬗ ┊B┊
+            o3 | o0 : KC.B,
+            o3 | o0 | o4 : KC.LSFT(KC.B),
+            o3 | o0 | i4 : KC.MACRO("b "),
+            o3 | o0 | o4 | i4 : KC.NO,
+
+            # ⬦⬙⬙⬦⬦ ┊U┊
+            i2 | i3 : KC.U,
+            i2 | i3 | o4 : KC.LSFT(KC.U),
+            i2 | i3 | i4 : KC.MACRO("u "),
+            i2 | i3 | o4 | i4 : KC.NO,
+            
+            # ⬦⬙⬦⬙⬦ ┊C┊ ┊copy┊
+            i1 | i3 : KC.C,
+            i1 | i3 | o4 : KC.LSFT(KC.C),
+            i1 | i3 | i4 : KC.MACRO("r "),
+            i1 | i3 | o4 | i4 : KC.LCTL(KC.C),
+            
+            # ⬦⬙⬦⬦⬖ ┊L┊ ┊select all┊
+            i3 | i0 : KC.L,
+            i3 | i0 | o4 : KC.LSFT(KC.L),
+            i3 | i0 | i4 : KC.MACRO("l "),
+            i3 | i0 | o4 | i4 : KC.LCTL(KC.A),
+
+            # ⬦⬦⬘⬘⬦ ┊G┊
+            o1 | o2 : KC.G,
+            o1 | o2 | o4 : KC.LSFT(KC.G),
+            o1 | o2 | i4 : KC.MACRO("g "),
+            o1 | o2 | o4 | i4 : KC.NO,
+
+            # ⬦⬦⬘⬦⬗ ┊Z┊ ┊undo┊
+            o2 | o0 : KC.Z,
+            o2 | o0 | o4 : KC.LSFT(KC.Z),
+            o2 | o0 | i4 : KC.MACRO("z "),
+            o2 | o0 | o4 | i4 : KC.LCTL(KC.Z),
+
+            # ⬦⬦⬙⬙⬦ ┊H┊
+            i1 | i2 : KC.H,
+            i1 | i2 | o4 : KC.LSFT(KC.H),
+            i1 | i2 | i4 : KC.MACRO("h "),
+            i1 | i2 | o4 | i4 : KC.NO,
+
+            # ⬦⬦⬙⬦⬖ ┊Q┊
+            i2 | i0 : KC.Q,
+            i2 | i0 | o4 : KC.LSFT(KC.Q),
+            i2 | i0 | i4 : KC.MACRO("q "),
+            i2 | i0 | o4 | i4 : KC.NO,
+
+            # ⬦⬦⬦⬘⬗ ┊Y┊ ┊redo┊
+            o1 | o0 : KC.Y,
+            o1 | o0 | o4 : KC.LSFT(KC.Y),
+            o1 | o0 | i4 : KC.MACRO("y "),
+            o1 | o0 | o4 | i4 : KC.LCTL(KC.Y),
+
+            # ⬦⬦⬦⬙⬖ ┊D┊
+            i1 | i0 : KC.D,
+            i1 | i0 | o4 : KC.LSFT(KC.D),
+            i1 | i0 | i4 : KC.MACRO("d "),
+            i1 | i0 | o4 | i4 : KC.AT,
+
+            # ⬦⬘⬙⬦⬦ ┊|┊ ┊/┊ ┊\┊ ┊%┊
+            i2 | o3 : KC.PIPE,
+            i2 | o3 | o4 : KC.BSLS,
+            i2 | o3 | i4 : KC.SLSH,
+            i2 | o3 | o4 | i4 : KC.PERC,
+
+            # ⬦⬘⬦⬙⬦ ┊V┊ ┊paste┊
+            i1 | o3 : KC.V,
+            i1 | o3 | o4 : KC.LSFT(KC.V),
+            i1 | o3 | i4 : KC.MACRO("v "),
+            i1 | o3 | o4 | i4 : KC.LCTL(KC.V),
+
+            # ⬦⬘⬦⬦⬖ ┊'┊ ┊`┊ ┊"┊ ┊°┊
+            o0 | o3 : KC.QUOTE,
+            o0 | o3 | o4 : KC.GRAVE,
+            o0 | o3 | i4 : KC.DQUO, #KC.AT,
+            o0 | o3 | o4 | i4 : KC.MACRO("°"),
+
+            # ⬦⬙⬘⬦⬦ ┊_┊ ┊+┊ ┊-┊ ┊±┊
+            o2 | i3 : KC.UNDS,
+            o2 | i3 | o4 : KC.PLUS,
+            o2 | i3 | i4 : KC.MINS,
+            o2 | i3 | o4 | i4 : KC.MACRO("±"),
+
+            # ⬦⬙⬦⬘⬦ ┊X┊ ┊cut┊
+            o1 | i3 : KC.X,
+            o1 | i3 | o4 : KC.LSFT(KC.X),
+            o1 | i3 | i4 : KC.MACRO("x "),
+            o1 | i3 | o4 | i4 : KC.LCTL(KC.X),
+
+            # ⬦⬙⬦⬦⬗ ┊,┊ ┊;┊ ┊.┊ ┊:┊
+            o0 | i3 : KC.COMMA,
+            o0 | i3 | o4 : KC.SCOLON,
+            o0 | i3 | i4 : KC.DOT,
+            o0 | i3 | o4 | i4 : KC.COLON,
+
+            # ⬦⬦⬘⬙⬦ ┊?┊ ┊@┊ ┊!┊ ┊&┊
+            i1 | o2: KC.QUES,
+            i1 | o2 | o4 : KC.AT, #KC.DQUO,
+            i1 | o2 | i4 : KC.EXCLAIM,
+            i1 | o2 | o4 | i4 : KC.AMPERSAND,
+
+            # ⬦⬦⬘⬦⬖ ┊J┊
+            o2 | i0 : KC.J,
+            o2 | i0 | o4 : KC.LSFT(KC.J),
+            o2 | i0 | i4 : KC.MACRO("j "),
+            o2 | i0 | o4 | i4 : KC.NO,
+
+            # ⬦⬦⬙⬘⬦ ┊=┊ ┊~┊ ┊≈┊ ┊≠┊
+            o1 | i2 : KC.EQUAL,
+            o1 | i2 | o4 : KC.TILDE,
+            o1 | i2 | i4 : KC.MACRO("≈"),
+            o1 | i2 | o4 | i4 : KC.MACRO("≠"),
+
+            # ⬦⬦⬙⬦⬗ ┊K┊
+            o0 | i2: KC.K,
+            o0 | i2 | o4 : KC.LSFT(KC.K),
+            o0 | i2 | i4 : KC.MACRO("k "),
+            o0 | i2 | o4 | i4 : KC.NO,
+
+            # ⬦⬦⬦⬘⬖ ┊W┊
             o1 | i0: KC.W,
-            o1 | i0 | o4: KC.LSFT(KC.W),
-            o1 | i0 | i4: KC.AMPR,
-            o1 | i0 | o4 | i4: KC.NO,
-            i2 | o3: KC.SLSH,
-            i2 | o3 | o4: KC.BSLS,
-            i2 | o3 | i4: KC.PIPE,
-            i2 | o3 | o4 | i4: KC.PRINT_SCREEN,
-            o2 | i3: KC.MINS,
-            o2 | i3 | o4: KC.UNDS,
-            o2 | i3 | i4: KC.PERC,
-            o2 | i3 | o4 | i4: KC.NO,
-            o1 | i2: KC.QUES,
-            o1 | i2 | o4: KC.EXLM,
-            o1 | i2 | i4: KC.NO,
-            o1 | i2 | o4 | i4: KC.NO,
-            i1 | o2: KC.COMM,
-            i1 | o2 | o4: KC.DOT,
-            i1 | o2 | i4: KC.TILD,
-            i1 | o2 | o4 | i4: KC.NO,
-            i3 | o0: KC.SCLN,
-            i2 | i3 | i0: KC.SCLN,
-            i3 | o0 | o4: KC.COLN,
-            i2 | i3 | i0 | o4: KC.COLN,
-            i3 | o0 | i4: KC.NO,
-            i2 | i3 | i0 | i4: KC.NO,
-            i3 | o0 | o4 | i4: KC.NO,
-            i2 | i3 | i0 | o4 | i4: KC.NO,
-            o3 | i0: KC.QUOT,
-            o2 | o3 | o0: KC.QUOT,
-            o3 | i0 | o4: KC.DQT,
-            o2 | o3 | o0 | o4: KC.DQT,
-            o3 | i0 | i4: KC.GRV,
-            o2 | o3 | o0 | i4: KC.GRV,
-            o3 | i0 | o4 | i4: KC.NO,
-            o2 | o3 | o0 | o4 | i4: KC.NO,
+            o1 | i0 | o4 : KC.LSFT(KC.W),
+            o1 | i0 | i4 : KC.MACRO("w "),
+            o1 | i0 | o4 | i4 : KC.NO,
+
+            # ⬦⬦⬦⬙⬗ ┊M┊
+            i1 | o0: KC.M,
+            i1 | o0 | o4 : KC.LSFT(KC.M),
+            i1 | o0 | i4 : KC.MACRO("m "),
+            i1 | o0 | o4 | i4 : KC.NO,
+
+            # ⬦⬘⬘⬘⬦ ┊tab┊ ┊shift+tab┊ ┊delete┊ ┊ins┊
             o1 | o2 | o3: KC.TAB,
-            o1 | o2 | o3 | o4: KC.DEL,
-            o1 | o2 | o3 | i4: KC.INS,
-            o1 | o2 | o3 | o4 | i4: KC.NO,
+            o1 | o2 | o3 | o4 : KC.LSFT(KC.TAB),
+            o1 | o2 | o3 | i4 : KC.DEL,
+            o1 | o2 | o3 | o4 | i4 : KC.INS,
+
+            # ⬦⬘⬘⬦⬗
+
+            # ⬦⬘⬦⬘⬗
+
+            # ⬦⬦⬘⬘⬗ ┊del┊ ┊ctrl+bkspace┊ ┊ctrl+del┊
+            o0 | o1 | o2 : KC.DEL,
+            o0 | o1 | o2 | o4 : KC.LCTRL(KC.BSPC),
+            o0 | o1 | o2 | i4 : KC.LCTRL(KC.DEL),
+
+            # ⬦⬙⬙⬙⬦ ┊enter┊ ┊none┊ ┊right alt┊ 
             i1 | i2 | i3: KC.ENTER,
-            i1 | i2 | i3 | o4: KC.ESC,
-            i1 | i2 | i3 | i4: KC.RALT,
-            i1 | i2 | i3 | o4 | i4: KC.NO,
-            i0 | o0: KC.LGUI,
-            i0 | o0 | o4: KC.RIGHT,
-            i0 | o0 | i4: KC.PGUP,
-            i0 | o0 | o4 | i4: KC.LAYER3,
+            i1 | i2 | i3 | o4 : KC.NO,
+            i1 | i2 | i3 | i4 : KC.RALT,
+            i1 | i2 | i3 | o4 | i4 : KC.NO,
+
+            # ⬦⬙⬙⬦⬖
+
+            # ⬦⬙⬦⬙⬖
+
+            # ⬦⬦⬙⬙⬖ ┊esc┊
+            i0 | i1 | i3 : KC.ESC,
+
+            # ⬦⬘⬙⬘⬦ ┊£┊ ┊€┊ ┊$┊  (mnemonic: v for value)
+            o1 | i2 | o3 : KC.MACRO("£"),
+            o1 | i2 | o3 | o4 : KC.MACRO("€"),
+            o1 | i2 | o3 | i4 : KC.DOLLAR,
+
+            # ⬦⬘⬙⬦⬗
+
+            # ⬦⬘⬦⬙⬗           
+
+            # ⬦⬦⬘⬙⬗
+
+            # ⬦⬙⬘⬙⬦ ┊^┊
+            i1 | o2 | i3 : KC.CIRC,
+
+            # ⬦⬙⬘⬦⬖
+
+            # ⬦⬙⬦⬘⬖
+
+            # ⬦⬦⬙⬘⬖
+
+            # ⬦⬘⬘⬙⬦
+
+            # ⬦⬘⬘⬦⬖
+
+            # ⬦⬘⬦⬘⬖
+
+            # ⬦⬦⬘⬘⬖
+
+            # ⬦⬙⬙⬘⬦
+
+            # ⬦⬙⬦⬙⬗
+
+            # ⬦⬦⬙⬙⬗
+
+            # ⬦⬘⬙⬙⬦
+
+            # ⬦⬘⬙⬦⬖
+
+            # ⬦⬘⬦⬙⬖
+
+            # ⬦⬦⬘⬙⬖
+
+            # ⬦⬙⬘⬘⬦
+
+            # ⬦⬙⬘⬦⬗
+
+            # ⬦⬙⬦⬘⬗
+
+            # ⬦⬦⬙⬘⬗
+
+            # ⬦⬘⬘⬘⬗ ┊0┊ ┊num0┊ ┊F20┊ (binary chords)
+
+            # ⬦⬘⬘⬘⬖ ┊1┊ ┊num1┊ ┊F1┊
+
+            # ⬦⬘⬘⬙⬗ ┊2┊ ┊num2┊ ┊F2┊
+
+            # ⬦⬘⬘⬙⬖ ┊3┊ ┊num3┊ ┊F3┊
+
+            # ⬦⬘⬙⬘⬗ ┊4┊ ┊num4┊ ┊F4┊
+
+            # ⬦⬘⬙⬘⬖ ┊5┊ ┊num5┊ ┊F5┊
+
+            # ⬦⬘⬙⬙⬗ ┊6┊ ┊num6┊ ┊F6┊
+
+            # ⬦⬘⬙⬙⬖ ┊7┊ ┊num7┊ ┊F7┊
+
+            # ⬦⬙⬘⬘⬗ ┊8┊ ┊num8┊ ┊F8┊
+
+            # ⬦⬙⬘⬘⬖ ┊9┊ ┊num9┊ ┊F9┊
+
+            # ⬦⬙⬘⬙⬗ ┊F10┊
+
+            # ⬦⬙⬘⬙⬖ ┊F11┊
+
+            # ⬦⬙⬙⬘⬗ ┊F12┊
+
+            # ⬦⬙⬙⬘⬖
+
+            # ⬦⬙⬙⬙⬗
+
+            # ⬦⬙⬙⬙⬖
+
+            # ⬦◆⬦⬦⬦
             i3 | o3: KC.LALT,
-            i3 | o3 | o4: KC.UP,
-            i3 | o3 | i4: KC.HOME,
-            i3 | o3 | o4 | i4: KC.LAYER2,
+            i3 | o3 | o4 : KC.UP,
+            i3 | o3 | i4 : KC.HOME,
+            i3 | o3 | o4 | i4 : KC.LAYER3,
+
+            # ⬦⬦◆⬦⬦
             i2 | o2: KC.LCTL,
-            i2 | o2 | o4: KC.DOWN,
-            i2 | o2 | i4: KC.END,
-            i2 | o2 | o4 | i4: KC.LAYER1,
+            i2 | o2 | o4 : KC.DOWN,
+            i2 | o2 | i4 : KC.END,
+            i2 | o2 | o4 | i4 : KC.LAYER2,
+
+            # ⬦⬦⬦◆⬦
             i1 | o1: KC.LSFT,
-            i1 | o1 | o4: KC.LEFT,
-            i1 | o1 | i4: KC.PGDN,
-            i1 | o1 | o4 | i4: KC.LAYER0,
+            i1 | o1 | o4 : KC.LEFT,
+            i1 | o1 | i4 : KC.PGDN,
+            i1 | o1 | o4 | i4 : KC.LAYER1,
+
+            # ⬦⬦⬦⬦◆
+            i0 | o0: KC.LGUI,
+            i0 | o0 | o4 : KC.RIGHT,
+            i0 | o0 | i4 : KC.PGUP,
+            i0 | o0 | o4 | i4 : KC.LAYER0,
+
+            # Modifiers
             o0 | i0 | o3 | i3: KC.MOD_GA,
             o0 | i0 | o2 | i2: KC.MOD_GC,
             o0 | i0 | o1 | i1: KC.MOD_GS,
@@ -269,7 +436,7 @@ class Taipo(Module):
             o0 | i0 | o3 | i3 | o2 | i2: KC.MOD_GAC,
             o0 | i0 | o3 | i3 | o1 | i1: KC.MOD_GAS,
             o0 | i0 | o2 | i2 | o1 | i1: KC.MOD_GCS,
-            o3 | i3 | o2 | i2 | o1 | i1: KC.MOD_ACS,    #
+            o3 | i3 | o2 | i2 | o1 | i1: KC.MOD_ACS,
             o0 | i0 | o3 | i3 | o2 | i2 | o1 | i1: KC.MOD_GACS,
         }
 

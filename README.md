@@ -10,8 +10,6 @@ Like Taipo Posh, this Taipo layout is modified enough to warrant a new name. I'l
 
 The main change is that space/bksp/shift are on the smallest finger, Finger4 (aka "pinky"). Aditionally, chording a character with the spacekey will add a space after it (e.g. "e " since space is pressed the most often), and backspace will act as shift (e.g. "E").
 
-Speaking of 'e', I've swapped 'e' and 't' so that 'the' rolls away from the centre.
-
 There's also some unicode characters that I feel should've been on a standard keyboard layout by now, such as the degree or plus/minus symbol.
 
-In taipo.py, I've renamed the variables and added unicode diagrams so that it's easier to see what key a chord corresponds to.
+In taipo.py, I've renamed the variables and added unicode diagrams so that it's easier to see what key a chord corresponds to. Like F0, F4 keys are horizontally placed because I find it much easier to rotate F4 to a key than hit a key above/below. Thus, the outer keys look like `⬖⬘⬘⬘⬗   ⬖⬘⬘⬘⬗`.
