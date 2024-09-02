@@ -148,11 +148,11 @@ class Taipo(Module):
             i0 | i4 : KC.MACRO("r "),
             i0 | o4 | i4 : KC.LABK,
 
-            # ⬦⬘⬘⬦⬦ ┊P┊
+            # ⬦⬘⬘⬦⬦ ┊C┊ ┊copy┊
             o2 | o3 : KC.P,
-            o2 | o3 | o4 : KC.LSFT(KC.P),
-            o2 | o3 | i4 : KC.MACRO("p "),
-            o2 | o3 | o4 | i4 : KC.NO,
+            o2 | o3 | o4 : KC.LSFT(KC.C),
+            o2 | o3 | i4 : KC.MACRO("c "),
+            o2 | o3 | o4 | i4 : KC.LCTL(KC.C),
 
             # ⬦⬘⬦⬘⬦ ┊F┊ ┊find┊
             o1 | o3 : KC.F,
@@ -172,11 +172,11 @@ class Taipo(Module):
             i2 | i3 | i4 : KC.MACRO("u "),
             i2 | i3 | o4 | i4 : KC.NO,
             
-            # ⬦⬙⬦⬙⬦ ┊C┊ ┊copy┊
+            # ⬦⬙⬦⬙⬦ ┊P┊ ┊onenote find┊
             i1 | i3 : KC.C,
-            i1 | i3 | o4 : KC.LSFT(KC.C),
-            i1 | i3 | i4 : KC.MACRO("r "),
-            i1 | i3 | o4 | i4 : KC.LCTL(KC.C),
+            i1 | i3 | o4 : KC.LSFT(KC.P),
+            i1 | i3 | i4 : KC.MACRO("p "),
+            i1 | i3 | o4 | i4 : KC.LCTL(KC.E),
             
             # ⬦⬙⬦⬦⬖ ┊L┊
             i3 | i0 : KC.L,
@@ -214,17 +214,17 @@ class Taipo(Module):
             o1 | o0 | i4 : KC.MACRO("y "),
             o1 | o0 | o4 | i4 : KC.LCTL(KC.Y),
 
-            # ⬦⬦⬦⬙⬖ ┊D┊ ┊onenote find┊
+            # ⬦⬦⬦⬙⬖ ┊D┊ 
             i1 | i0 : KC.D,
             i1 | i0 | o4 : KC.LSFT(KC.D),
             i1 | i0 | i4 : KC.MACRO("d "),
-            i1 | i0 | o4 | i4 : KC.LCTL(KC.E),
+            i1 | i0 | o4 | i4 : KC.NO,
 
-            # ⬦⬘⬙⬦⬦ ┊|┊ ┊/┊ ┊\┊ ┊%┊
-            i2 | o3 : KC.PIPE,
-            i2 | o3 | o4 : KC.BSLS,
-            i2 | o3 | i4 : KC.SLSH,
-            i2 | o3 | o4 | i4 : KC.PERC,
+            # ⬦⬘⬙⬦⬦ ┊X┊ ┊cut┊
+            i2 | o3 : KC.X,
+            i2 | o3 | o4 : KC.LSFT(KC.X),
+            i2 | o3 | i4 : KC.MACRO("x "),
+            i2 | o3 | o4 | i4 : KC.LCTL(KC.X),
 
             # ⬦⬘⬦⬙⬦ ┊V┊ ┊paste┊
             i1 | o3 : KC.V,
@@ -244,11 +244,11 @@ class Taipo(Module):
             o2 | i3 | i4 : KC.MINS,
             o2 | i3 | o4 | i4 : KC.MACRO("±"),
 
-            # ⬦⬙⬦⬘⬦ ┊X┊ ┊cut┊
-            o1 | i3 : KC.X,
-            o1 | i3 | o4 : KC.LSFT(KC.X),
-            o1 | i3 | i4 : KC.MACRO("x "),
-            o1 | i3 | o4 | i4 : KC.LCTL(KC.X),
+            # ⬦⬙⬦⬘⬦ ┊|┊ ┊/┊ ┊\┊ ┊%┊
+            o1 | i3 : KC.PIPE,
+            o1 | i3 | o4 : KC.BSLS,
+            o1 | i3 | i4 : KC.SLSH,
+            o1 | i3 | o4 | i4 : KC.PERC,
 
             # ⬦⬙⬦⬦⬗ ┊,┊ ┊;┊ ┊.┊ ┊:┊
             o0 | i3 : KC.COMMA,
@@ -315,7 +315,8 @@ class Taipo(Module):
 
             # ⬦⬙⬙⬦⬖
 
-            # ⬦⬙⬦⬙⬖
+            # ⬦⬙⬦⬙⬖ ┊desktop┊
+            i0 | i1 | i3 : KC.LGUI(KC.D),
 
             # ⬦⬦⬙⬙⬖ ┊esc┊
             i0 | i1 | i3 : KC.ESC,
