@@ -315,7 +315,9 @@ class Taipo(Module):
             i1 | i2 | i3 | i4 : KC.RALT,
             i1 | i2 | i3 | o4 | i4 : KC.NO,
 
-            # ⬦⬙⬙⬦⬖
+            # ⬦⬙⬙⬦⬖ ┊left┊ ┊none┊ ┊right┊ (topleft/bottomright)
+            i0 | i2 | i3 : KC.LEFT,
+            i0 | i2 | i3 | i4 : KC.RIGHT,
 
             # ⬦⬙⬦⬙⬖ ┊desktop┊
             i0 | i1 | i3 : KC.LGUI(KC.D),
@@ -351,10 +353,12 @@ class Taipo(Module):
             # ⬦⬘⬘⬙⬦ ┊explorer┊
             i1 | o2 | o3 : KC.LGUI(KC.E),
 
-            # ⬦⬘⬘⬦⬖ ┊circuitpy visible┊
-            i0 | o2 | o3 : KC.MACRO(toggle_drive),
+            # ⬦⬘⬘⬦⬖ ┊up┊ ┊none┊ ┊down┊
+            i0 | o2 | o3 : KC.UP,
+            i0 | o2 | o3 | i4 : KC.DOWN,
 
-            # ⬦⬘⬦⬘⬖
+            # ⬦⬘⬦⬘⬖ ┊circuitpy visible┊
+            i0 | o1 | o3 : KC.MACRO(toggle_drive),
 
             # ⬦⬦⬘⬘⬖ ┊pgup┊ ┊none┊ ┊ctrl+pgup┊
             i0 | o1 | o2 : KC.PGUP,
