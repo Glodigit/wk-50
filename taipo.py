@@ -163,10 +163,10 @@ class Taipo(Module):
             o1 | o3 | o4 | i4 : KC.LCTL(KC.F),
 
             # ⬦⬘⬦⬦⬗ ┊B┊ ┊select all┊
-            o3 | o0 : KC.B,
-            o3 | o0 | o4 : KC.LSFT(KC.B),
-            o3 | o0 | i4 : KC.MACRO("b "),
-            o3 | o0 | o4 | i4 : KC.LCTL(KC.A), # mnemonic: blue all
+            o0 | o3 : KC.B,
+            o0 | o3 | o4 : KC.LSFT(KC.B),
+            o0 | o3 | i4 : KC.MACRO("b "),
+            o0 | o3 | o4 | i4 : KC.LCTL(KC.A), # mnemonic: blue all
 
             # ⬦⬙⬙⬦⬦ ┊U┊
             i2 | i3 : KC.U,
@@ -181,10 +181,10 @@ class Taipo(Module):
             i1 | i3 | o4 | i4 : KC.LCTL(KC.E),
             
             # ⬦⬙⬦⬦⬖ ┊L┊
-            i3 | i0 : KC.L,
-            i3 | i0 | o4 : KC.LSFT(KC.L),
-            i3 | i0 | i4 : KC.MACRO("l "),
-            i3 | i0 | o4 | i4 : KC.NO,
+            i0 | i3 : KC.L,
+            i0 | i3 | o4 : KC.LSFT(KC.L),
+            i0 | i3 | i4 : KC.MACRO("l "),
+            i0 | i3 | o4 | i4 : KC.NO,
 
             # ⬦⬦⬘⬘⬦ ┊G┊
             o1 | o2 : KC.G,
@@ -193,10 +193,10 @@ class Taipo(Module):
             o1 | o2 | o4 | i4 : KC.NO,
 
             # ⬦⬦⬘⬦⬗ ┊Z┊ ┊undo┊
-            o2 | o0 : KC.Z,
-            o2 | o0 | o4 : KC.LSFT(KC.Z),
-            o2 | o0 | i4 : KC.MACRO("z "),
-            o2 | o0 | o4 | i4 : KC.LCTL(KC.Z),
+            o0 | o2 : KC.Z,
+            o0 | o2 | o4 : KC.LSFT(KC.Z),
+            o0 | o2 | i4 : KC.MACRO("z "),
+            o0 | o2 | o4 | i4 : KC.LCTL(KC.Z),
 
             # ⬦⬦⬙⬙⬦ ┊H┊
             i1 | i2 : KC.H,
@@ -205,22 +205,22 @@ class Taipo(Module):
             i1 | i2 | o4 | i4 : KC.NO,
 
             # ⬦⬦⬙⬦⬖ ┊Q┊
-            i2 | i0 : KC.Q,
-            i2 | i0 | o4 : KC.LSFT(KC.Q),
-            i2 | i0 | i4 : KC.MACRO("q "),
-            i2 | i0 | o4 | i4 : KC.NO,
+            i0 | i2 : KC.Q,
+            i0 | i2 | o4 : KC.LSFT(KC.Q),
+            i0 | i2 | i4 : KC.MACRO("q "),
+            i0 | i2 | o4 | i4 : KC.NO,
 
             # ⬦⬦⬦⬘⬗ ┊Y┊ ┊redo┊
-            o1 | o0 : KC.Y,
-            o1 | o0 | o4 : KC.LSFT(KC.Y),
-            o1 | o0 | i4 : KC.MACRO("y "),
-            o1 | o0 | o4 | i4 : KC.LCTL(KC.Y),
+            o0 | o1 : KC.Y,
+            o0 | o1 | o4 : KC.LSFT(KC.Y),
+            o0 | o1 | i4 : KC.MACRO("y "),
+            o0 | o1 | o4 | i4 : KC.LCTL(KC.Y),
 
             # ⬦⬦⬦⬙⬖ ┊D┊ 
-            i1 | i0 : KC.D,
-            i1 | i0 | o4 : KC.LSFT(KC.D),
-            i1 | i0 | i4 : KC.MACRO("d "),
-            i1 | i0 | o4 | i4 : KC.NO,
+            i0 | i1 : KC.D,
+            i0 | i1 | o4 : KC.LSFT(KC.D),
+            i0 | i1 | i4 : KC.MACRO("d "),
+            i0 | i1 | o4 | i4 : KC.NO,
 
             # ⬦⬘⬙⬦⬦ ┊X┊ ┊cut┊
             i2 | o3 : KC.X,
@@ -265,10 +265,10 @@ class Taipo(Module):
             i1 | o2 | o4 | i4 : KC.AMPERSAND,
 
             # ⬦⬦⬘⬦⬖ ┊J┊
-            o2 | i0 : KC.J,
-            o2 | i0 | o4 : KC.LSFT(KC.J),
-            o2 | i0 | i4 : KC.MACRO("j "),
-            o2 | i0 | o4 | i4 : KC.NO,
+            i0 | o2 : KC.J,
+            i0 | o2 | o4 : KC.LSFT(KC.J),
+            i0 | o2 | i4 : KC.MACRO("j "),
+            i0 | o2 | o4 | i4 : KC.NO,
 
             # ⬦⬦⬙⬘⬦ ┊=┊ ┊~┊ ┊≈┊ ┊≠┊
             o1 | i2 : KC.EQUAL,
@@ -283,16 +283,16 @@ class Taipo(Module):
             o0 | i2 | o4 | i4 : KC.NO,
 
             # ⬦⬦⬦⬘⬖ ┊W┊
-            o1 | i0: KC.W,
-            o1 | i0 | o4 : KC.LSFT(KC.W),
-            o1 | i0 | i4 : KC.MACRO("w "),
-            o1 | i0 | o4 | i4 : KC.NO,
+            i0 | o1: KC.W,
+            i0 | o1 | o4 : KC.LSFT(KC.W),
+            i0 | o1 | i4 : KC.MACRO("w "),
+            i0 | o1 | o4 | i4 : KC.NO,
 
             # ⬦⬦⬦⬙⬗ ┊M┊
-            i1 | o0: KC.M,
-            i1 | o0 | o4 : KC.LSFT(KC.M),
-            i1 | o0 | i4 : KC.MACRO("m "),
-            i1 | o0 | o4 | i4 : KC.NO,
+            o0 | i1: KC.M,
+            o0 | i1 | o4 : KC.LSFT(KC.M),
+            o0 | i1 | i4 : KC.MACRO("m "),
+            o0 | i1 | o4 | i4 : KC.NO,
 
             # ⬦⬘⬘⬘⬦ ┊tab┊ ┊shift+tab┊ ┊alt+tab┊ ┊gui+tab┊
             o1 | o2 | o3: KC.TAB,
