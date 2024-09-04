@@ -50,7 +50,8 @@ class ADNS5050(Module):
         self.dimLED = dimLED
 
         # In degrees:
-        self.north = north 
+        self.north = north
+        self.delta_err = [0.0, 0.0]
         self.leftright = leftright # adjustment angle for specific hands
         self.lr_enabled = False
         self.is_left = True
@@ -138,7 +139,6 @@ class ADNS5050(Module):
         self.adns_write(REG.Mouse_Control2, cpi[cpi_mode] | 0x10)
     
     def set_leftright(self, hand=0, enable=True):
-
         if not hand:
             self.lr_enabled = False
         elif enable:            
@@ -147,6 +147,9 @@ class ADNS5050(Module):
             elif hand == 2 and self.leftright[1] != 0:
                 self.is_left = False
                 self.lr_enabled = True
+
+    def get_sign(self, val):
+        return 1 if val > 0 else 0 if val == 0 else -1
     
     def during_bootup(self, keyboard):
         self.adns_write(REG.Chip_Reset, 0x5A)
@@ -181,9 +184,11 @@ class ADNS5050(Module):
                 north += self.leftright[1]
 
         if north: # Apply north correction
-            delta_xy = complex(delta_x, delta_y) * 1j**(north/90)
-            delta_x = round(delta_xy.real)
-            delta_y = round(delta_xy.imag) 
+            delta_xy = complex(delta_x + self.delta_err[0], delta_y + self.delta_err[0]) * 1j**(north/90)
+            self.delta_err[0] = self.get_sign(delta_xy.real) * (abs(delta_xy.real) % 1)
+            self.delta_err[1] = self.get_sign(delta_xy.imag) * (abs(delta_xy.imag) % 1)
+            delta_x = (int)(delta_xy.real)
+            delta_y = (int)(delta_xy.imag)
 
         if delta_x:
             if self.invert_x:
@@ -196,7 +201,8 @@ class ADNS5050(Module):
             AX.Y.move(keyboard, delta_y)
         
         if 0 & keyboard.debug_enabled & (delta_x | delta_y):
-            print('Delta: ', delta_x, ' ', delta_y)
+            print('  Delta:', delta_x, ' ', delta_y)
+            print('Delta-E: %.2f %.2f' % (self.delta_err[0],  self.delta_err[1]))
         
 
     def after_matrix_scan(self, keyboard):
