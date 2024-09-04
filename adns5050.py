@@ -5,7 +5,8 @@ from micropython import const
 import digitalio
 import microcontroller
 
-from kmk.keys import AX, make_key
+from kmk.keys import KC, AX, make_key
+from kmk.modules.macros import Press, Release
 from kmk.modules import Module
 
 
@@ -37,7 +38,11 @@ class ADNS5050(Module):
     DIR_READ = const(0x7F)
 
     # Not compatible with standard SPI bus, so slightly different names used
-    def __init__(self, ncs, clk, dio, cpi=7, dimLED=False,  north=0, leftright = [45, 45], invert_x=True, invert_y=True,):
+    def __init__(self, ncs, clk, dio, 
+                 cpi=7, dimLED=False, 
+                 north=0, leftright = [45, 45], 
+                 invert_x=True, invert_y=True, invert_s=False, 
+                 scroll_speed=1/16):
         self.ncs = digitalio.DigitalInOut(ncs)
         self.clk = digitalio.DigitalInOut(clk)
         self.dio = digitalio.DigitalInOut(dio)
@@ -46,12 +51,21 @@ class ADNS5050(Module):
 
         self.invert_x = invert_x
         self.invert_y = invert_y
+        self.invert_s = invert_s
         self.cpi = cpi
         self.dimLED = dimLED
 
-        # In degrees:
-        self.north = north
-        self.delta_err = [0.0, 0.0]
+        self.scroll_enabled = False
+        self.scroll_speed = scroll_speed
+        self.scroll_accu = [0.0, 0.0]
+
+        make_key(names=('TB_TSCR',), on_press=self._tb_tscr) # Toggle Scroll
+        make_key(names=('TB_HSCR',), # Hold to Scroll (or descroll, depending on toggle)
+                 on_press=self._tb_tscr,
+                 on_release=self._tb_tscr) 
+
+        self.north = north 
+        self.delta_err = [0.0, 0.0] # fractional part of delta ints
         self.leftright = leftright # adjustment angle for specific hands
         self.lr_enabled = False
         self.is_left = True
@@ -59,15 +73,13 @@ class ADNS5050(Module):
         make_key(names=('TB_NOR',), on_press=self._tb_nor)
         make_key(names=('TB_LHA',), on_press=self._tb_lha)
         make_key(names=('TB_RHA',), on_press=self._tb_rha)
-        
-    def _tb_nor(self, *args, **kwargs):
-        self.set_leftright(0)
 
-    def _tb_lha(self, *args, **kwargs):
-        self.set_leftright(1)
-
-    def _tb_rha(self, *args, **kwargs):
-        self.set_leftright(2)
+    # Helper functions
+    def get_sign(self, val):
+        return 1 if val > 0 else 0 if val == 0 else -1
+    
+    def get_fractional(self, val):
+        return self.get_sign(val) * (abs(val) % 1)
 
     def twos_comp(self, data):
         if (data & 0x80) == 0x80:
@@ -75,6 +87,7 @@ class ADNS5050(Module):
         else:
             return data
     
+    # ADNS read/write
     def adns_start(self):
         self.ncs.value = False
 
@@ -128,30 +141,7 @@ class ADNS5050(Module):
         self.adns_stop() # Cancel rest of burst output
         return motion
     
-    
-    def get_cpi(self):
-        cpi = self.adns_read(REG.Mouse_Control2)
-        return (cpi & 0xF) * 125
-    
-    # Accepts values from 0 to 10 inclusive
-    def set_cpi(self, cpi_mode=7): # Default - 1000 CPI
-        cpi = range(1, 12)
-        self.adns_write(REG.Mouse_Control2, cpi[cpi_mode] | 0x10)
-    
-    def set_leftright(self, hand=0, enable=True):
-        if not hand:
-            self.lr_enabled = False
-        elif enable:            
-            if hand == 1 and self.leftright[0] != 0:
-                self.is_left = self.lr_enabled = True
-            elif hand == 2 and self.leftright[1] != 0:
-                self.is_left = False
-                self.lr_enabled = True
-
-    def get_sign(self, val):
-        return 1 if val > 0 else 0 if val == 0 else -1
-    
-    def during_bootup(self, keyboard):
+    def adns5050_init(self, keyboard):
         self.adns_write(REG.Chip_Reset, 0x5A)
         time.sleep(0.1) # Datasheet minimum is 0.055
         self.set_cpi(cpi_mode=self.cpi)
@@ -166,8 +156,32 @@ class ADNS5050(Module):
             print('ADNS:  Revision ID ', hex(self.adns_read(REG.Revision_ID)))
             print('ADNS: MouseControl ', '2' if self.adns_read(REG.Mouse_Control2) & (1<<4) else '1')
             print('ADNS: Control2 CPI ', self.get_cpi())
+    
+    def get_cpi(self):
+        cpi = self.adns_read(REG.Mouse_Control2)
+        return (cpi & 0xF) * 125
+    
+    def set_cpi(self, cpi_mode=7): # Default - 1000 CPI. Accepts values from 0 to 10 inclusive
+        cpi = range(1, 12)
+        self.adns_write(REG.Mouse_Control2, cpi[cpi_mode] | 0x10)
+    
+    # Toggles / settings
+    def set_leftright(self, hand=0, enable=True):
+        if not hand:
+            self.lr_enabled = False
+        elif enable:            
+            if hand == 1 and self.leftright[0] != 0:
+                self.is_left = self.lr_enabled = True
+            elif hand == 2 and self.leftright[1] != 0:
+                self.is_left = False
+                self.lr_enabled = True
+    def toggle_scroll(self):
+        self.scroll_enabled = not self.scroll_enabled
 
-        return
+
+    # Keyboard
+    def during_bootup(self, keyboard):
+        self.adns5050_init(keyboard)
 
     def before_matrix_scan(self, keyboard):
         if not self.adns_read(REG.Motion) >> 7:
@@ -185,24 +199,44 @@ class ADNS5050(Module):
 
         if north: # Apply north correction
             delta_xy = complex(delta_x + self.delta_err[0], delta_y + self.delta_err[0]) * 1j**(north/90)
-            self.delta_err[0] = self.get_sign(delta_xy.real) * (abs(delta_xy.real) % 1)
-            self.delta_err[1] = self.get_sign(delta_xy.imag) * (abs(delta_xy.imag) % 1)
+            self.delta_err[0] = self.get_fractional(delta_xy.real)
+            self.delta_err[1] = self.get_fractional(delta_xy.imag)
             delta_x = (int)(delta_xy.real)
             delta_y = (int)(delta_xy.imag)
 
-        if delta_x:
-            if self.invert_x:
-                delta_x *= -1
-            AX.X.move(keyboard, delta_x)
+        if self.scroll_enabled:
+            delta_s = complex(delta_x * self.scroll_speed + self.scroll_accu[0],
+                              delta_y * self.scroll_speed + self.scroll_accu[1])
+            self.scroll_accu[0] = self.get_fractional(delta_s.real)
+            self.scroll_accu[1] = self.get_fractional(delta_s.imag)
+            scroll_x = (int)(delta_s.real)
+            scroll_y = (int)(delta_s.imag)
 
-        if delta_y:
-            if self.invert_y:
-                delta_y *= -1
-            AX.Y.move(keyboard, delta_y)
+            if scroll_x:
+                if self.invert_s: scroll_x *= -1 
+                """ KC.MACRO( 
+                    Press(KC.LSFT),
+                    AX.W.move(keyboard, scroll_x),
+                    Release(KC.LSFT),) """
+
+            if scroll_y:
+                if self.invert_s: scroll_y *= -1 
+                AX.W.move(keyboard, scroll_y)
+
+        else:    
+            if delta_x:
+                if self.invert_x: delta_x *= -1 
+                AX.X.move(keyboard, delta_x)
+
+            if delta_y:
+                if self.invert_y: delta_y *= -1 
+                AX.Y.move(keyboard, delta_y)
+                    
         
-        if 0 & keyboard.debug_enabled & (delta_x | delta_y):
-            print('  Delta:', delta_x, ' ', delta_y)
-            print('Delta-E: %.2f %.2f' % (self.delta_err[0],  self.delta_err[1]))
+        if 1 & keyboard.debug_enabled & (delta_x | delta_y):
+            print('   Delta: %7.0f %7.0f' % (delta_x, delta_y))
+            print(' Delta-E: %7.4f %7.4f' % (self.delta_err[0],  self.delta_err[1]))
+            print('Scroll-E: %7.4f %7.4f' % (self.scroll_accu[0], self.scroll_accu[1]))
         
 
     def after_matrix_scan(self, keyboard):
@@ -220,3 +254,17 @@ class ADNS5050(Module):
 
     def on_powersave_disable(self, keyboard):
         return
+    
+    # Custom keys
+    def _tb_tscr(self, *args, **kwargs):    # toggle scroll
+        self.toggle_scroll()    
+    
+    def _tb_nor(self, *args, **kwargs):     # use north
+        self.set_leftright(0)
+
+    def _tb_lha(self, *args, **kwargs):     #angle north for left hand
+        self.set_leftright(1)
+
+    def _tb_rha(self, *args, **kwargs):     #angle north for right hand
+        self.set_leftright(2)
+

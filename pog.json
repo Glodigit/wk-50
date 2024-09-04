@@ -491,8 +491,8 @@
             "KC.W",
             "KC.E",
             "KC.R",
-            "KC.T",
-            "KC.Y",
+            "KC.TD(KC.TB_LHA,KC.TB_NOR)",
+            "KC.TD(KC.TB_RHA,KC.TB_NOR)",
             "KC.U",
             "KC.I",
             "KC.O",
@@ -526,11 +526,11 @@
             "KC.TRNS",
             "KC.TRNS",
             "KC.SPC",
-            "KC.TRNS",
-            "KC.TRNS",
+            "KC.MB_LMB",
+            "KC.MB_RMB",
             "KC.RGB_TOG",
-            "KC.TRNS",
-            "KC.TRNS",
+            "KC.MB_RMB",
+            "KC.MB_LMB",
             "KC.BSPC",
             "KC.TRNS",
             "KC.TRNS",
@@ -636,5 +636,5 @@
         "rgb"
     ],
     "flashingMode": "automatic",
-    "lastEdited": "2024-08-28 13:05"
+    "lastEdited": "2024-09-04 11:54"
 }
