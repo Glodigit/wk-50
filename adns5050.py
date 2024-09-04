@@ -5,7 +5,7 @@ from micropython import const
 import digitalio
 import microcontroller
 
-from kmk.keys import AX
+from kmk.keys import AX, make_key
 from kmk.modules import Module
 
 
@@ -37,17 +37,36 @@ class ADNS5050(Module):
     DIR_READ = const(0x7F)
 
     # Not compatible with standard SPI bus, so slightly different names used
-    def __init__(self, ncs, clk, dio, dimLED=False, invert_x=True, invert_y=True, north=0,):
-        self.invert_x = invert_x
-        self.invert_y = invert_y
-        self.dimLED = dimLED
-        self.north = north # degrees
-        
+    def __init__(self, ncs, clk, dio, cpi=7, dimLED=False,  north=0, leftright = [45, 45], invert_x=True, invert_y=True,):
         self.ncs = digitalio.DigitalInOut(ncs)
         self.clk = digitalio.DigitalInOut(clk)
         self.dio = digitalio.DigitalInOut(dio)
         self.ncs.direction = self.clk.direction = digitalio.Direction.OUTPUT
         self.ncs.value = self.clk.value = True
+
+        self.invert_x = invert_x
+        self.invert_y = invert_y
+        self.cpi = cpi
+        self.dimLED = dimLED
+
+        # In degrees:
+        self.north = north 
+        self.leftright = leftright # adjustment angle for specific hands
+        self.lr_enabled = False
+        self.is_left = True
+
+        make_key(names=('TB_NOR',), on_press=self._tb_nor)
+        make_key(names=('TB_LHA',), on_press=self._tb_lha)
+        make_key(names=('TB_RHA',), on_press=self._tb_rha)
+        
+    def _tb_nor(self, *args, **kwargs):
+        self.set_leftright(0)
+
+    def _tb_lha(self, *args, **kwargs):
+        self.set_leftright(1)
+
+    def _tb_rha(self, *args, **kwargs):
+        self.set_leftright(2)
 
     def twos_comp(self, data):
         if (data & 0x80) == 0x80:
@@ -117,12 +136,22 @@ class ADNS5050(Module):
     def set_cpi(self, cpi_mode=7): # Default - 1000 CPI
         cpi = range(1, 12)
         self.adns_write(REG.Mouse_Control2, cpi[cpi_mode] | 0x10)
+    
+    def set_leftright(self, hand=0, enable=True):
 
+        if not hand:
+            self.lr_enabled = False
+        elif enable:            
+            if hand == 1 and self.leftright[0] != 0:
+                self.is_left = self.lr_enabled = True
+            elif hand == 2 and self.leftright[1] != 0:
+                self.is_left = False
+                self.lr_enabled = True
     
     def during_bootup(self, keyboard):
         self.adns_write(REG.Chip_Reset, 0x5A)
         time.sleep(0.1) # Datasheet minimum is 0.055
-        self.set_cpi()
+        self.set_cpi(cpi_mode=self.cpi)
         
         # Disables LED dimming slightly when inactive. Can cause mouse to jiggle +/- 1px.
         if not self.dimLED:
@@ -144,8 +173,15 @@ class ADNS5050(Module):
         delta_x = self.twos_comp(motion[0])
         delta_y = self.twos_comp(motion[1])
 
-        if self.north: # Apply north correction
-            delta_xy = complex(delta_x, delta_y) * 1j**(self.north/90)
+        north = self.north
+        if self.lr_enabled:
+            if self.is_left:
+                north -= self.leftright[0]
+            else:
+                north += self.leftright[1]
+
+        if north: # Apply north correction
+            delta_xy = complex(delta_x, delta_y) * 1j**(north/90)
             delta_x = round(delta_xy.real)
             delta_y = round(delta_xy.imag) 
 
@@ -159,7 +195,7 @@ class ADNS5050(Module):
                 delta_y *= -1
             AX.Y.move(keyboard, delta_y)
         
-        if keyboard.debug_enabled & (delta_x | delta_y):
+        if 0 & keyboard.debug_enabled & (delta_x | delta_y):
             print('Delta: ', delta_x, ' ', delta_y)
         
 

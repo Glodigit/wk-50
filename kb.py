@@ -98,11 +98,12 @@ class POGKeyboard(KMKKeyboard):
 
         # Trackball
         from adns5050 import ADNS5050
-        self.modules.append(ADNS5050(board.XY_NCS, board.XY_SCLK, board.XY_SDIO, north=-4))
+        self.modules.append(ADNS5050(board.XY_NCS, board.XY_SCLK, board.XY_SDIO, 
+                                     north=-2, leftright=[18, 18]))
 
         # Taipo
-        from taipo import Taipo
-        self.modules.append(Taipo())
+        #from taipo import Taipo
+        #self.modules.append(Taipo())
         
         # Encoders
         if pog.hasEncoders:
