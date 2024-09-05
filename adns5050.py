@@ -214,11 +214,7 @@ class ADNS5050(Module):
 
             if scroll_x:
                 if self.invert_s: scroll_x *= -1 
-                """ keyboard.tap_key(KC.MACRO( 
-                    Press(KC.LSFT),
-                    AX.W.move(keyboard, scroll_x),
-                    Release(KC.LSFT),
-                    )) """
+                AX.P.move(keyboard, scroll_x)
 
             if scroll_y:
                 if self.invert_s: scroll_y *= -1 
