@@ -1,19 +1,18 @@
 # Based on QMK's adns5050.c and KMK's adns9800.py implementations
 
 import time
-from micropython import const
 import digitalio
 import microcontroller
+from   micropython import const
 
-from kmk.keys import KC, AX, make_key
-from kmk.modules.macros import Press, Release
-from kmk.modules import Module
+from   kmk.keys    import AX, make_key
+from   kmk.modules import Module
 
 
-class REG: # Only 5 of these registers are used
-    Product_ID = const(0x0) 
-    Revision_ID = const(0x1)
-    Motion = const(0x2)
+class REG: # Only 7 of these registers are used, marked with '#'
+    Product_ID = const(0x0)         #
+    Revision_ID = const(0x1)        #
+    Motion = const(0x2)             #
     Delta_X = const(0x3)
     Delta_Y = const(0x4)
     SQUAL = const(0x5)
@@ -24,12 +23,12 @@ class REG: # Only 5 of these registers are used
     Minimum_Pixel = const(0xA)
     Pixel_Grab = const(0xB)
     Mouse_Control = const(0xD)
-    Mouse_Control2 = const(0x19)
-    LED_DC_Mode = const(0x22)
-    Chip_Reset = const(0x3A)
+    Mouse_Control2 = const(0x19)    #
+    LED_DC_Mode = const(0x22)       #
+    Chip_Reset = const(0x3A)        #
     Product_ID2 = const(0x3E)
     Inv_Rev_ID = const(0x3F)
-    Motion_Burst = const(0x63)
+    Motion_Burst = const(0x63)      #
 
 
 class ADNS5050(Module):
