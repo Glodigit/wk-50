@@ -504,18 +504,6 @@
             "KC.TRNS",
             "KC.TRNS",
             "KC.TRNS",
-            "KC.MB_MMB",
-            "KC.MB_MMB",
-            "KC.TRNS",
-            "KC.TRNS",
-            "KC.TRNS",
-            "KC.TRNS",
-            "KC.TRNS",
-            "KC.TRNS",
-            "KC.TRNS",
-            "KC.TRNS",
-            "KC.TRNS",
-            "KC.TRNS",
             "KC.MB_RMB",
             "KC.MB_RMB",
             "KC.TRNS",
@@ -525,13 +513,25 @@
             "KC.TRNS",
             "KC.TRNS",
             "KC.TRNS",
-            "KC.TB_TSCR",
+            "KC.TRNS",
+            "KC.TRNS",
+            "KC.TRNS",
+            "KC.MB_LMB",
             "KC.MB_LMB",
             "KC.TRNS",
+            "KC.TRNS",
+            "KC.TRNS",
+            "KC.TRNS",
+            "KC.TRNS",
+            "KC.TRNS",
+            "KC.TRNS",
+            "KC.MB_MMB",
+            "KC.TB_TSCR",
+            "KC.LCTL",
             "KC.RGB_TOG",
-            "KC.TRNS",
-            "KC.MB_LMB",
+            "KC.RCTL",
             "KC.TB_TSCR",
+            "KC.MB_MMB",
             "KC.TRNS",
             "KC.TRNS",
             "KC.TRNS",
@@ -546,8 +546,8 @@
     "encoderKeymap": [
         [
             [
-                "KC.RGB_HUD",
-                "KC.RGB_HUI"
+                "KC.MW_DN",
+                "KC.MW_UP"
             ]
         ]
     ],
@@ -624,6 +624,15 @@
     "coordMapSetup": false,
     "rgbPin": "board.NEOPIXEL",
     "rgbNumLeds": 58,
+    "rgbOptions": {
+        "animationMode": 0,
+        "hueDefault": 0,
+        "satDefault": 255,
+        "valDefault": 255,
+        "animationSpeed": 1,
+        "breatheCenter": 1,
+        "knightEffectLength": 3
+    },
     "kbFeatures": [
         "basic",
         "serial",
@@ -636,5 +645,5 @@
         "rgb"
     ],
     "flashingMode": "automatic",
-    "lastEdited": "2024-09-04 15:49"
+    "lastEdited": "2024-09-05 09:38"
 }
