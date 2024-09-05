@@ -42,7 +42,7 @@ class ADNS5050(Module):
                  cpi=7, dimLED=False, 
                  north=0, leftright = [45, 45], 
                  invert_x=True, invert_y=True, invert_s=False, 
-                 scroll_speed=1/16):
+                 scroll_speed=[1/2, 1/16]):
         self.ncs = digitalio.DigitalInOut(ncs)
         self.clk = digitalio.DigitalInOut(clk)
         self.dio = digitalio.DigitalInOut(dio)
@@ -56,7 +56,7 @@ class ADNS5050(Module):
         self.dimLED = dimLED
 
         self.scroll_enabled = False
-        self.scroll_speed = scroll_speed
+        self.scroll_speed = scroll_speed # pan not working, so moves mouse x in meantime
         self.scroll_accu = [0.0, 0.0]
 
         make_key(names=('TB_TSCR',), on_press=self._tb_tscr) # Toggle Scroll
@@ -205,16 +205,16 @@ class ADNS5050(Module):
             delta_y = (int)(delta_xy.imag)
 
         if self.scroll_enabled:
-            delta_s = complex(delta_x * self.scroll_speed + self.scroll_accu[0],
-                              delta_y * self.scroll_speed + self.scroll_accu[1])
+            delta_s = complex(delta_x * self.scroll_speed[0] + self.scroll_accu[0],
+                              delta_y * self.scroll_speed[1] + self.scroll_accu[1])
             self.scroll_accu[0] = self.get_fractional(delta_s.real)
             self.scroll_accu[1] = self.get_fractional(delta_s.imag)
             scroll_x = (int)(delta_s.real)
             scroll_y = (int)(delta_s.imag)
 
             if scroll_x:
-                if self.invert_s: scroll_x *= -1 
-                AX.P.move(keyboard, scroll_x)
+                if self.invert_x: scroll_x *= -1 
+                AX.X.move(keyboard, scroll_x)
 
             if scroll_y:
                 if self.invert_s: scroll_y *= -1 
