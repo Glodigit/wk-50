@@ -99,7 +99,7 @@ class POGKeyboard(KMKKeyboard):
         # Trackball
         from adns5050 import ADNS5050
         self.modules.append(ADNS5050(board.XY_NCS, board.XY_SCLK, board.XY_SDIO, 
-                                     north=-2, leftright=[18, 18]))
+                                     north=-2, leftright=[12, 12]))
 
         # Taipo
         #from taipo import Taipo

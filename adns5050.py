@@ -42,7 +42,7 @@ class ADNS5050(Module):
                  cpi=7, dimLED=False, 
                  north=0, leftright = [45, 45], 
                  invert_x=True, invert_y=True, invert_s=False, 
-                 scroll_speed=[1/2, 1/16]):
+                 scroll_speed=[1/2, 1/32]):
         self.ncs = digitalio.DigitalInOut(ncs)
         self.clk = digitalio.DigitalInOut(clk)
         self.dio = digitalio.DigitalInOut(dio)
