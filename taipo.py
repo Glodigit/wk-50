@@ -2,20 +2,24 @@
 # SPDX-FileCopyrightText: © 2023 Dane Lipscombe @dlip
 # SPDX-FileCopyrightText: © 2024 Kelvin Afolabi @glodigit
 
+# remove if unused
 try:
     from typing import Optional, Tuple, Union
 except ImportError:
     pass
 from micropython import const
-
 import kmk.handlers.stock as handlers
-from kmk.keys import Key, KC, make_key
 from kmk.kmk_keyboard import KMKKeyboard
+
+from kmk.keys import Key, KC, make_argumented_key
 from kmk.modules import Module
 from kmk.utils import Debug
 from supervisor import ticks_ms
 
-from customkeys import toggle_drive
+try: # importing a pog autogen function
+    from customkeys import toggle_drive
+except ImportError:
+    pass
 
 debug = Debug(__name__)
 
@@ -25,21 +29,21 @@ taipo_keycodes = {
     'TP_OL2': 2,
     'TP_OL1': 3,
     'TP_OL0': 4,
-    'TP_OR0': 5,
-    'TP_OR1': 6,
-    'TP_OR2': 7,
-    'TP_OR3': 8,
-    'TP_OR4': 9,
-    'TP_IL4': 10,
-    'TP_IL3': 11,
-    'TP_IL2': 12,
-    'TP_IL1': 13,
-    'TP_IL0': 14,
-    'TP_IR0': 15,
-    'TP_IR1': 16,
+    'TP_IL4': 5,
+    'TP_IL3': 6,
+    'TP_IL2': 7,
+    'TP_IL1': 8,
+    'TP_IL0': 9,
+    'TP_OR4': 10,
+    'TP_OR3': 11,
+    'TP_OR2': 12,
+    'TP_OR1': 13,
+    'TP_OR0': 14,
+    'TP_IR4': 15,
+    'TP_IR3': 16,
     'TP_IR2': 17,
-    'TP_IR3': 18,
-    'TP_IR4': 19,
+    'TP_IR1': 18,
+    'TP_IR0': 19,
     'LAYER0': 20,
     'LAYER1': 21,
     'LAYER2': 22,
@@ -57,17 +61,21 @@ taipo_keycodes = {
     'MOD_GACS': 34,
 };
 
-o4 = 1 << 0
-o3 = 1 << 1
-o2 = 1 << 2
-o1 = 1 << 3
-o0 = 1 << 4
-i4 = 1 << 5
-i3 = 1 << 6
-i2 = 1 << 7
-i1 = 1 << 8
-i0 = 1 << 9
+o4 = const(1 << 0)
+o3 = const(1 << 1)
+o2 = const(1 << 2)
+o1 = const(1 << 3)
+o0 = const(1 << 4)
+i4 = const(1 << 5)
+i3 = const(1 << 6)
+i2 = const(1 << 7)
+i1 = const(1 << 8)
+i0 = const(1 << 9)
 
+class TaipoKey(Key):
+    def __init__(self, id, **kwargs):
+        super().__init__(**kwargs)
+        self.id = id
 
 class KeyPress:
     keycode = KC.NO
@@ -88,8 +96,12 @@ class Taipo(Module):
         self.tap_timeout = tap_timeout
         self.sticky_timeout=sticky_timeout
         self.state = [State(), State()]
-        for key, code in taipo_keycodes.items():
-            make_key( names=(key,), meta=TaipoMeta(code))
+        for name, ID in taipo_keycodes.items():
+            make_argumented_key(
+                names=(name,),
+                constructor=TaipoKey(ID)
+                #on_press=self.
+                )
 
         # Outer Finger 4---0: ⬖⬘⬘⬘⬗
         self.keymap = {
@@ -465,15 +477,15 @@ class Taipo(Module):
             i0 | i1 | o2 | i3 | i4 : KC.F17,
             
             # Onenote 
-            # ⬦⬙⬙⬙⬗ ┊datestamp┊ ┊datestamp+bkspace┊ ┊datestamp+dash┊
+            # ⬦⬙⬙⬙⬗ ┊datestamp┊ ┊datestamp+bkspace┊ ┊datestamp+minus┊
             i0 | i1 | o2 | o3 : KC.LSFT(KC.LALT(KC.D)),
             i0 | i1 | o2 | o3 | o4 : KC.MACRO(KC.LSFT(KC.LALT(KC.D)), KC.BSPC),
-            i0 | i1 | o2 | o3 | i4 : KC.MACRO(KC.LSFT(KC.LALT(KC.D)), KC.DASH),
+            i0 | i1 | o2 | o3 | i4 : KC.MACRO(KC.LSFT(KC.LALT(KC.D)), KC.MINUS),
 
-            # ⬦⬙⬙⬙⬖ ┊timestamp┊ ┊timestamp+bkspace┊ ┊timestamp+dash┊
+            # ⬦⬙⬙⬙⬖ ┊timestamp┊ ┊timestamp+bkspace┊ ┊timestamp+minus┊
             i0 | i1 | o2 | i3 : KC.LSFT(KC.LALT(KC.T)),
             i0 | i1 | o2 | i3 | o4 : KC.MACRO(KC.LSFT(KC.LALT(KC.T)), KC.BSPC),
-            i0 | i1 | o2 | i3 | i4 : KC.MACRO(KC.LSFT(KC.LALT(KC.T)), KC.DASH),
+            i0 | i1 | o2 | i3 | i4 : KC.MACRO(KC.LSFT(KC.LALT(KC.T)), KC.MINUS),
 
             # Modifiers / Layers
             # ⬦◆⬦⬦⬦
