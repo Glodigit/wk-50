@@ -1,4 +1,5 @@
 # Based on QMK's adns5050.c and KMK's adns9800.py implementations
+# SPDX-FileCopyrightText: © 2024 Kelvin Afolabi @glodigit
 
 import time
 import digitalio
