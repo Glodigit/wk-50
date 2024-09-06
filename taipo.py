@@ -2,16 +2,8 @@
 # SPDX-FileCopyrightText: © 2023 Dane Lipscombe @dlip
 # SPDX-FileCopyrightText: © 2024 Kelvin Afolabi @glodigit
 
-# remove if unused
-try:
-    from typing import Optional, Tuple, Union
-except ImportError:
-    pass
 from micropython import const
-import kmk.handlers.stock as handlers
-from kmk.kmk_keyboard import KMKKeyboard
-
-from kmk.keys import Key, KC, make_argumented_key
+from kmk.keys import Key, KC, make_argumented_key, make_key
 from kmk.modules import Module
 from kmk.utils import Debug
 from supervisor import ticks_ms
@@ -23,27 +15,25 @@ except ImportError:
 
 debug = Debug(__name__)
 
+_TICKS_PERIOD = const(1<<29)
+_TICKS_MAX = const(_TICKS_PERIOD-1)
+_TICKS_HALFPERIOD = const(_TICKS_PERIOD//2)
+
+def ticks_add(ticks, delta):
+    "Add a delta to a base number of ticks, performing wraparound at 2**29ms."
+    return (ticks + delta) % _TICKS_PERIOD
+
+def ticks_diff(ticks1, ticks2):
+    "Compute the signed difference between two ticks values, assuming that they are within 2**28 ticks"
+    diff = (ticks1 - ticks2) & _TICKS_MAX
+    diff = ((diff + _TICKS_HALFPERIOD) & _TICKS_MAX) - _TICKS_HALFPERIOD
+    return diff
+
+def ticks_less(ticks1, ticks2):
+    "Return true if ticks1 is less than ticks2, assuming that they are within 2**28 ticks"
+    return ticks_diff(ticks1, ticks2) < 0
+
 taipo_keycodes = {
-    'TP_OL4': 0,
-    'TP_OL3': 1,
-    'TP_OL2': 2,
-    'TP_OL1': 3,
-    'TP_OL0': 4,
-    'TP_IL4': 5,
-    'TP_IL3': 6,
-    'TP_IL2': 7,
-    'TP_IL1': 8,
-    'TP_IL0': 9,
-    'TP_OR4': 10,
-    'TP_OR3': 11,
-    'TP_OR2': 12,
-    'TP_OR1': 13,
-    'TP_OR0': 14,
-    'TP_IR4': 15,
-    'TP_IR3': 16,
-    'TP_IR2': 17,
-    'TP_IR1': 18,
-    'TP_IR0': 19,
     'LAYER0': 20,
     'LAYER1': 21,
     'LAYER2': 22,
@@ -72,36 +62,35 @@ i2 = const(1 << 7)
 i1 = const(1 << 8)
 i0 = const(1 << 9)
 
-class TaipoKey(Key):
-    def __init__(self, id, **kwargs):
+class TaipoKey(Key):        # boilerplate for argumented key
+    def __init__(self, code, **kwargs):
         super().__init__(**kwargs)
-        self.id = id
-
-class KeyPress:
-    keycode = KC.NO
-    hold = False
-    hold_handled = False
+        self.taipo_code = code
     
 class State:
-    combo = 0
-    timer = 0
-    key = KeyPress()
-
-class TaipoMeta:
-    def __init__(self, code):
-        self.taipo_code = code
+    def __init__(self):
+        self.reset()
+    def reset(self):
+        self.combo = 0               # store of physical keys pressed
+        self.timer = 0               # time elapsed since first key
+        self.keycode = KC.NO         # determined KC key
+        self.hold = False
+        self.hold_handled = False
     
 class Taipo(Module):
     def __init__(self, tap_timeout=150, sticky_timeout=1000):
         self.tap_timeout = tap_timeout
         self.sticky_timeout=sticky_timeout
         self.state = [State(), State()]
-        for name, ID in taipo_keycodes.items():
-            make_argumented_key(
-                names=(name,),
-                constructor=TaipoKey(ID)
-                #on_press=self.
+        make_argumented_key(
+                names=('TP', 'TAIP', 'TETAIP',),
+                constructor=TaipoKey,
+                #on_press=self._tp_pressed,
+                #on_release=self._tp_released,
                 )
+        for name, code in taipo_keycodes.items():
+            make_key(names=(name,))
+            
 
         # Outer Finger 4---0: ⬖⬘⬘⬘⬗
         self.keymap = {
@@ -529,97 +518,34 @@ class Taipo(Module):
         pass
 
     def before_matrix_scan(self, keyboard):
+        pass
+
+    def after_matrix_scan(self, keyboard):
         for side in [0, 1]:
-            if self.state[side].timer != 0 and ticks_ms() > self.state[side].timer:
-                self.state[side].key.keycode = self.determine_key(self.state[side].combo)
-                self.state[side].key.hold = True
+            if self.state[side].timer and ticks_less(self.state[side].timer, ticks_ms()):
+                self.state[side].keycode = self.determine_key(self.state[side].combo)
+                self.state[side].hold = True
                 self.handle_key(keyboard, side)
                 self.state[side].timer = 0
 
-    def after_matrix_scan(self, keyboard):
-        pass
-
     def process_key(self, keyboard, key, is_pressed, int_coord):
-        if hasattr(key.meta, 'taipo_code'):
-            side = 1 if key.meta.taipo_code / 10 >= 1 else 0
-            code = key.meta.taipo_code
+        if hasattr(key, 'taipo_code'): # Only TaipoKeys will have this
+            side = 1 if key.taipo_code / 10 >= 1 else 0
             if is_pressed:
-                if self.state[side].key.keycode != KC.NO:
+                if self.state[side].keycode != KC.NO:
                     self.handle_key(keyboard, side)
-                    self.clear_state(side)
+                    self.state[side].reset()
                 
-                self.state[side].combo |= 1 << (key.meta.taipo_code % 10)
-                self.state[side].timer = ticks_ms() + self.tap_timeout
+                self.state[side].combo |= 1 << (key.taipo_code % 10)
+                self.state[side].timer = ticks_add(ticks_ms(), self.tap_timeout)
             else:
-                if not self.state[side].key.hold:
-                    self.state[side].key.keycode = self.determine_key(self.state[side].combo)
+                if not self.state[side].hold:
+                    self.state[side].keycode = self.determine_key(self.state[side].combo)
                 self.handle_key(keyboard, side)
-                self.clear_state(side)
+                self.state[side].reset()
         else:
             return key
-
-    def clear_state(self, side):
-        # why does this not work?
-        # self.state[side] = State()
-        self.state[side].combo = 0
-        self.state[side].timer = 0
-        self.state[side].key.keycode = KC.NO
-        self.state[side].key.hold = False
-        self.state[side].key.hold_handled = False
-        
-    def handle_key(self, keyboard, side):
-        key = self.state[side].key
-        mods = []
-
-        if key.keycode in [ KC.LGUI, KC.LALT, KC.RALT, KC.LCTL, KC.LSFT ]:
-            mods = [key.keycode]
-        elif key.keycode == KC.MOD_GA:
-            mods = [KC.LGUI, KC.LALT]
-        elif key.keycode == KC.MOD_GC:
-            mods = [KC.LGUI,KC.LCTL]
-        elif key.keycode == KC.MOD_GS:
-            mods = [KC.LGUI,KC.LSFT]
-        elif key.keycode == KC.MOD_AC:
-            mods = [KC.LALT,KC.LSFT]
-        elif key.keycode == KC.MOD_AS:
-            mods = [KC.LALT,KC.LSFT]
-        elif key.keycode == KC.MOD_CS:
-            mods = [KC.LCTL,KC.LSFT]
-        elif key.keycode == KC.MOD_GAC:
-            mods = [KC.LGUI,KC.LALT,KC.LSFT]
-        elif key.keycode == KC.MOD_GAS:
-            mods = [KC.LGUI,KC.LALT,KC.LSFT]
-        elif key.keycode == KC.MOD_GCS:
-            mods = [KC.LGUI,KC.LCTL,KC.LSFT]
-        elif key.keycode == KC.MOD_ACS:
-            mods = [KC.LALT,KC.LCTL,KC.LSFT]
-        elif key.keycode == KC.MOD_GACS:
-            mods = [KC.LGUI,KC.LALT,KC.LCTL,KC.LSFT]
-
-        if len(mods) > 0:
-            for mod in mods:
-                if key.hold_handled:
-                    keyboard.remove_key(mod)
-                elif key.hold:
-                    keyboard.add_key(mod)
-                    self.state[side].key.hold_handled = True
-                else:
-                    keyboard.tap_key(KC.OS(mod, tap_time=self.sticky_timeout))
-        else:
-            if key.hold_handled:
-                keyboard.remove_key(key.keycode)
-            elif key.hold:
-                keyboard.add_key(key.keycode)
-                self.state[side].key.hold_handled = True
-            else:
-                keyboard.tap_key(key.keycode)
-        
-    def determine_key(self, val):
-        if val in self.keymap:
-            return self.keymap[val]
-        else:
-            return KC.NO
-       
+    
     def before_hid_send(self, keyboard):
         pass
 
@@ -632,3 +558,67 @@ class Taipo(Module):
     def on_powersave_disable(self, keyboard):
         pass
 
+    def _tp_pressed(self, key, *args, **kwargs):
+        side = 1 if key.code / 10 >= 1 else 0
+        if self.state[side].combo == 0: 
+            # This is the first press of a new combo
+            self.state[side].timer = ticks_add(ticks_ms(), self.tap_timeout)
+        self.state[side].combo |= 1 << (key.code % 10)
+    
+    def _tp_released(self, key, *args, **kwargs):
+        pass
+        #side = 1 if key.code / 10 >= 1 else 0
+        #self.state[side].combo &= ~(1 << (key.code % 10))
+        
+    def handle_key(self, keyboard, side):
+        state = self.state[side]
+        mods = []
+
+        if state.keycode in [ KC.LGUI, KC.LALT, KC.RALT, KC.LCTL, KC.LSFT ]:
+            mods = [state.keycode]
+        elif state.keycode == KC.MOD_GA:
+            mods = [KC.LGUI, KC.LALT]
+        elif state.keycode == KC.MOD_GC:
+            mods = [KC.LGUI,KC.LCTL]
+        elif state.keycode == KC.MOD_GS:
+            mods = [KC.LGUI,KC.LSFT]
+        elif state.keycode == KC.MOD_AC:
+            mods = [KC.LALT,KC.LSFT]
+        elif state.keycode == KC.MOD_AS:
+            mods = [KC.LALT,KC.LSFT]
+        elif state.keycode == KC.MOD_CS:
+            mods = [KC.LCTL,KC.LSFT]
+        elif state.keycode == KC.MOD_GAC:
+            mods = [KC.LGUI,KC.LALT,KC.LSFT]
+        elif state.keycode == KC.MOD_GAS:
+            mods = [KC.LGUI,KC.LALT,KC.LSFT]
+        elif state.keycode == KC.MOD_GCS:
+            mods = [KC.LGUI,KC.LCTL,KC.LSFT]
+        elif state.keycode == KC.MOD_ACS:
+            mods = [KC.LALT,KC.LCTL,KC.LSFT]
+        elif state.keycode == KC.MOD_GACS:
+            mods = [KC.LGUI,KC.LALT,KC.LCTL,KC.LSFT]
+
+        if len(mods) > 0:
+            for mod in mods:
+                if state.hold_handled:
+                    keyboard.remove_key(mod)
+                elif state.hold:
+                    keyboard.add_key(mod)
+                    state.hold_handled = True
+                else:
+                    keyboard.tap_key(KC.OS(mod, tap_time=self.sticky_timeout))
+        else:
+            if state.hold_handled:
+                keyboard.remove_key(state.keycode)
+            elif state.hold:
+                keyboard.add_key(state.keycode)
+                state.hold_handled = True
+            else:
+                keyboard.tap_key(state.keycode)
+
+    def determine_key(self, val):
+        if val in self.keymap:
+            return self.keymap[val]
+        else:
+            return KC.NO
