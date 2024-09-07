@@ -257,10 +257,10 @@ class Taipo(Module):
             i1 | o3 | o4 | i4 : KC.LCTL(KC.V),
 
             # ⬦⬘⬦⬦⬖ ┊'┊ ┊`┊ ┊"┊ ┊°┊
-            o0 | o3 : KC.QUOTE,
-            o0 | o3 | o4 : KC.GRAVE,
-            o0 | o3 | i4 : KC.AT, #KC.DQUO,
-            o0 | o3 | o4 | i4 : KC.MACRO("°"),
+            i0 | o3 : KC.QUOTE,
+            i0 | o3 | o4 : KC.GRAVE,
+            i0 | o3 | i4 : KC.AT, #KC.DQUO,
+            i0 | o3 | o4 | i4 : KC.MACRO("°"),
 
             # ⬦⬙⬘⬦⬦ ┊_┊ ┊+┊ ┊-┊ ┊±┊
             o2 | i3 : KC.UNDS,
@@ -281,7 +281,7 @@ class Taipo(Module):
             o0 | i3 | o4 | i4 : KC.COLON,
 
             # ⬦⬦⬘⬙⬦ ┊?┊ ┊@┊ ┊!┊ ┊&┊
-            i1 | o2: KC.QUES,
+            i1 | o2 : KC.QUES,
             i1 | o2 | o4 : KC.DQUO, # .AT,
             i1 | o2 | i4 : KC.EXCLAIM,
             i1 | o2 | o4 | i4 : KC.AMPERSAND,
@@ -299,13 +299,13 @@ class Taipo(Module):
             o1 | i2 | o4 | i4 : KC.MACRO("≠"),
 
             # ⬦⬦⬙⬦⬗ ┊K┊
-            o0 | i2: KC.K,
+            o0 | i2 : KC.K,
             o0 | i2 | o4 : KC.LSFT(KC.K),
             o0 | i2 | i4 : KC.MACRO("k "),
             o0 | i2 | o4 | i4 : KC.NO,
 
             # ⬦⬦⬦⬘⬖ ┊W┊
-            i0 | o1: KC.W,
+            i0 | o1 : KC.W,
             i0 | o1 | o4 : KC.LSFT(KC.W),
             i0 | o1 | i4 : KC.MACRO("w "),
             i0 | o1 | o4 | i4 : KC.NO,
@@ -317,7 +317,7 @@ class Taipo(Module):
             o0 | i1 | o4 | i4 : KC.NO,
 
             # ⬦⬘⬘⬘⬦ ┊tab┊ ┊shift+tab┊ ┊alt+tab┊ ┊gui+tab┊
-            o1 | o2 | o3: KC.TAB,
+            o1 | o2 | o3 : KC.TAB,
             o1 | o2 | o3 | o4 : KC.LSFT(KC.TAB),
             o1 | o2 | o3 | i4 : KC.LALT(KC.TAB),
             o1 | o2 | o3 | o4 | i4 : KC.LGUI(KC.TAB),
@@ -332,7 +332,7 @@ class Taipo(Module):
             o0 | o1 | o2 | i4 : KC.LCTRL(KC.DEL),
 
             # ⬦⬙⬙⬙⬦ ┊enter┊ ┊none┊ ┊right alt┊ 
-            i1 | i2 | i3: KC.ENTER,
+            i1 | i2 | i3 : KC.ENTER,
             i1 | i2 | i3 | o4 : KC.NO,
             i1 | i2 | i3 | i4 : KC.RGUI,    # I remapped RALT to backspace 
             i1 | i2 | i3 | o4 | i4 : KC.NO, # and RGUI to RALT
@@ -345,7 +345,7 @@ class Taipo(Module):
             i0 | i1 | i3 : KC.LGUI(KC.D),
 
             # ⬦⬦⬙⬙⬖ ┊esc┊
-            i0 | i1 | i3 : KC.ESC,
+            i0 | i1 | i2 : KC.ESC,
 
             # ⬦⬘⬙⬘⬦ ┊£┊ ┊€┊ ┊$┊  (mnemonic: v for value)
             o1 | i2 | o3 : KC.HASH,
@@ -397,8 +397,8 @@ class Taipo(Module):
             o0 | i1 | i2 | i4 : KC.LCTRL(KC.PGDN),
 
             # ⬦⬘⬙⬙⬦ ┊end┊ ┊none┊ ┊ctrl+end┊
-            i1 | o2 | o3 : KC.END,
-            i1 | o2 | o3 | i4 : KC.LCTRL(KC.END),
+            i1 | i2 | o3 : KC.END,
+            i1 | i2 | o3 | i4 : KC.LCTRL(KC.END),
 
             # ⬦⬘⬙⬦⬖
 
@@ -441,9 +441,9 @@ class Taipo(Module):
             i0 | i1 | o2 | o3 | i4 : KC.F3,
 
             # ⬦⬘⬙⬘⬗ ┊4┊ ┊num4┊ ┊F4┊
-            o0 | i1 | o2 | o3 :      KC.N4,
-            o0 | i1 | o2 | o3 | o4 : KC.P4,
-            o0 | i1 | o2 | o3 | i4 : KC.F4,
+            o0 | o1 | i2 | o3 :      KC.N4,
+            o0 | o1 | i2 | o3 | o4 : KC.P4,
+            o0 | o1 | i2 | o3 | i4 : KC.F4,
 
             # ⬦⬘⬙⬘⬖ ┊5┊ ┊num5┊ ┊F5┊
             i0 | o1 | i2 | o3 :      KC.N5,
@@ -471,31 +471,31 @@ class Taipo(Module):
             i0 | o1 | o2 | i3 | i4 : KC.F9,
 
             # ⬦⬙⬘⬙⬗ ┊F10┊ ┊none┊ ┊F14┊
-            i0 | o1 | i2 | o3 : KC.F10,
-            i0 | o1 | i2 | o3 | i4: KC.F14,
+            o0 | i1 | o2 | i3 : KC.F10,
+            o0 | i1 | o2 | i3 | i4: KC.F14,
 
             # ⬦⬙⬘⬙⬖ ┊F11┊ ┊none┊ ┊F15┊
-            i0 | o1 | i2 | i3 : KC.F11,
-            i0 | o1 | i2 | i3 | i4 : KC.F15,
+            i0 | i1 | o2 | i3 : KC.F11,
+            i0 | i1 | o2 | i3 | i4 : KC.F15,
 
             # ⬦⬙⬙⬘⬗ ┊F12┊ ┊none┊ ┊F16┊
-            i0 | i1 | o2 | o3 : KC.F12,
-            i0 | i1 | o2 | o3 | i4 : KC.F16,
+            o0 | o1 | i2 | i3 : KC.F12,
+            o0 | o1 | i2 | i3 | i4 : KC.F16,
 
             # ⬦⬙⬙⬘⬖ ┊F13┊ ┊none┊ ┊F17┊
-            i0 | i1 | o2 | i3 : KC.F13,
-            i0 | i1 | o2 | i3 | i4 : KC.F17,
+            i0 | o1 | i2 | i3 : KC.F13,
+            i0 | o1 | i2 | i3 | i4 : KC.F17,
             
             # Onenote 
             # ⬦⬙⬙⬙⬗ ┊datestamp┊ ┊datestamp+bkspace┊ ┊datestamp+minus┊
-            i0 | i1 | o2 | o3 : KC.LSFT(KC.LALT(KC.D)),
-            i0 | i1 | o2 | o3 | o4 : KC.MACRO(KC.LSFT(KC.LALT(KC.D)), KC.BSPC),
-            i0 | i1 | o2 | o3 | i4 : KC.MACRO(KC.LSFT(KC.LALT(KC.D)), KC.MINUS),
+            o0 | i1 | i2 | i3 : KC.LSFT(KC.LALT(KC.D)),
+            o0 | i1 | i2 | i3 | o4 : KC.MACRO(KC.LSFT(KC.LALT(KC.D)), KC.BSPC),
+            o0 | i1 | i2 | i3 | i4 : KC.MACRO(KC.LSFT(KC.LALT(KC.D)), KC.MINUS),
 
             # ⬦⬙⬙⬙⬖ ┊timestamp┊ ┊timestamp+bkspace┊ ┊timestamp+minus┊
-            i0 | i1 | o2 | i3 : KC.LSFT(KC.LALT(KC.T)),
-            i0 | i1 | o2 | i3 | o4 : KC.MACRO(KC.LSFT(KC.LALT(KC.T)), KC.BSPC),
-            i0 | i1 | o2 | i3 | i4 : KC.MACRO(KC.LSFT(KC.LALT(KC.T)), KC.MINUS),
+            i0 | i1 | i2 | i3 : KC.LSFT(KC.LALT(KC.T)),
+            i0 | i1 | i2 | i3 | o4 : KC.MACRO(KC.LSFT(KC.LALT(KC.T)), KC.BSPC),
+            i0 | i1 | i2 | i3 | i4 : KC.MACRO(KC.LSFT(KC.LALT(KC.T)), KC.MINUS),
 
             # Modifiers / Layers
             # ⬦◆⬦⬦⬦ ┊Left Alt┊      ┊none┊ ┊Layer 3┊
