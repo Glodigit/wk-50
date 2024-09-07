@@ -34,6 +34,26 @@ def ticks_less(ticks1, ticks2):
     return ticks_diff(ticks1, ticks2) < 0
 
 taipo_keycodes = {
+    'TP_OL4': 0,
+    'TP_OL3': 1,
+    'TP_OL2': 2,
+    'TP_OL1': 3,
+    'TP_OL0': 4,
+    'TP_IL4': 5,
+    'TP_IL3': 6,
+    'TP_IL2': 7,
+    'TP_IL1': 8,
+    'TP_IL0': 9,
+    'TP_OR4': 10,
+    'TP_OR3': 11,
+    'TP_OR2': 12,
+    'TP_OR1': 13,
+    'TP_OR0': 14,
+    'TP_IR4': 15,
+    'TP_IR3': 16,
+    'TP_IR2': 17,
+    'TP_IR1': 18,
+    'TP_IR0': 19,
     'LAYER0': 20,
     'LAYER1': 21,
     'LAYER2': 22,
@@ -62,10 +82,12 @@ i2 = const(1 << 7)
 i1 = const(1 << 8)
 i0 = const(1 << 9)
 
-class TaipoKey(Key):        # boilerplate for argumented key
-    def __init__(self, code, **kwargs):
-        super().__init__(**kwargs)
+class TaipoKey(Key):
+    def __init__(self, code: Optional[int] = None):
         self.taipo_code = code
+    
+    def __repr__(self):
+        return super().__repr__() + '(' + str(self.taipo_code) + ')'
     
 class State:
     def __init__(self):
@@ -82,14 +104,13 @@ class Taipo(Module):
         self.tap_timeout = tap_timeout
         self.sticky_timeout=sticky_timeout
         self.state = [State(), State()]
-        make_argumented_key(
-                names=('TP', 'TAIP', 'TETAIP',),
-                constructor=TaipoKey,
-                #on_press=self._tp_pressed,
-                #on_release=self._tp_released,
-                )
+
         for name, code in taipo_keycodes.items():
-            make_key(names=(name,))
+            make_key(
+                names=(name,),
+                constructor=TaipoKey,
+                code=code,
+                )
             
 
         # Outer Finger 4---0: ⬖⬘⬘⬘⬗
