@@ -173,7 +173,7 @@ class Taipo(Module):
             i0 | o4 | i4 : KC.LABK,
 
             # ⬦⬘⬘⬦⬦ ┊C┊ ┊copy┊
-            o2 | o3 : KC.P,
+            o2 | o3 : KC.C,
             o2 | o3 | o4 : KC.LSFT(KC.C),
             o2 | o3 | i4 : KC.MACRO("c "),
             o2 | o3 | o4 | i4 : KC.LCTL(KC.C),
@@ -197,7 +197,7 @@ class Taipo(Module):
             i2 | i3 | o4 | i4 : KC.NO,
             
             # ⬦⬙⬦⬙⬦ ┊P┊ ┊onenote find┊
-            i1 | i3 : KC.C,
+            i1 | i3 : KC.P,
             i1 | i3 | o4 : KC.LSFT(KC.P),
             i1 | i3 | i4 : KC.MACRO("p "),
             i1 | i3 | o4 | i4 : KC.LCTL(KC.E),
