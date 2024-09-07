@@ -130,16 +130,16 @@ class Taipo(Module):
             o3 | i4 : KC.MACRO("o "),
             o3 | o4 | i4 : KC.RCBR,
 
-            # ⬦⬦⬘⬦⬦ ┊N┊ ┊]┊
-            o2 : KC.N,   
-            o2 | o4 : KC.LSFT(KC.N),
-            o2 | i4 : KC.MACRO("n "),
+            # ⬦⬦⬘⬦⬦ ┊I┊ ┊]┊
+            o2 : KC.I,   
+            o2 | o4 : KC.LSFT(KC.I),
+            o2 | i4 : KC.MACRO("i "),
             o2 | o4 | i4 : KC.RBRC,
 
-            # ⬦⬦⬦⬘⬦ ┊I┊ ┊)┊
-            o1 : KC.I,   
-            o1 | o4 : KC.LSFT(KC.I),
-            o1 | i4 : KC.MACRO("i "),
+            # ⬦⬦⬦⬘⬦ ┊N┊ ┊)┊
+            o1 : KC.N,   
+            o1 | o4 : KC.LSFT(KC.N),
+            o1 | i4 : KC.MACRO("n "),
             o1 | o4 | i4 : KC.RPRN,
 
             # ⬦⬦⬦⬦⬗ ┊S┊ ┊>┊
@@ -154,16 +154,16 @@ class Taipo(Module):
             i3 | i4 : KC.MACRO("a "),   
             i3 | o4 | i4 : KC.LCBR,
 
-            # ⬦⬦⬙⬦⬦ ┊T┊ ┊[┊
-            i2 : KC.T,
-            i2 | o4 : KC.LSFT(KC.T),
-            i2 | i4 : KC.MACRO("t "),
+            # ⬦⬦⬙⬦⬦ ┊E┊ ┊[┊
+            i2 : KC.E,
+            i2 | o4 : KC.LSFT(KC.E),
+            i2 | i4 : KC.MACRO("e "),
             i2 | o4 | i4 : KC.LBRC,
 
-            # ⬦⬦⬦⬙⬦ ┊E┊ ┊(┊
-            i1 : KC.E,
-            i1 | o4 : KC.LSFT(KC.E),
-            i1 | i4 : KC.MACRO("e "),
+            # ⬦⬦⬦⬙⬦ ┊T┊ ┊(┊
+            i1 : KC.T,
+            i1 | o4 : KC.LSFT(KC.T),
+            i1 | i4 : KC.MACRO("t "),
             i1 | o4 | i4 : KC.LPRN,
 
             # ⬦⬦⬦⬦⬖ ┊R┊ ┊<┊
