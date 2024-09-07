@@ -5,7 +5,7 @@ A modified version of Taipo is implemented to be able to have an ambidextrous ke
 # Setup
 Copy the files into CIRCUITPY after pog has installed KMK onto it. I'd recommend a diffchecker for files that are already on the keyboard to see if anything's changed since.
 
-# Tetaip (not yet working)
+# Tetaip
 Like Taipo Posh, this Taipo layout is modified enough to warrant a new name. I'll call it Tetaip, the Tetent-themed version of Taipo (with some similarities to Posh).
 
 The main change is that space/bksp/shift are on the smallest finger, Finger4 (aka "pinky"). Aditionally, chording a character with the spacekey will add a space after it (e.g. "e " since space is pressed the most often). Like Taipo, chording with backspace will act as shift (e.g. "E").

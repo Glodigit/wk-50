@@ -498,25 +498,25 @@ class Taipo(Module):
             i0 | i1 | o2 | i3 | i4 : KC.MACRO(KC.LSFT(KC.LALT(KC.T)), KC.MINUS),
 
             # Modifiers / Layers
-            # ⬦◆⬦⬦⬦
+            # ⬦◆⬦⬦⬦ ┊Left Alt┊      ┊none┊ ┊Layer 3┊
             i3 | o3: KC.LALT,
             i3 | o3 | o4 : KC.NO,
             i3 | o3 | i4 : KC.LAYER3,
             i3 | o3 | o4 | i4 : KC.NO,
 
-            # ⬦⬦◆⬦⬦
+            # ⬦⬦◆⬦⬦ ┊Left Control┊  ┊none┊ ┊Layer 2┊
             i2 | o2: KC.LCTL,
             i2 | o2 | o4 : KC.NO,
             i2 | o2 | i4 : KC.LAYER2,
             i2 | o2 | o4 | i4 : KC.NO,
 
-            # ⬦⬦⬦◆⬦
+            # ⬦⬦⬦◆⬦ ┊Left Shift┊    ┊none┊ ┊Layer 1┊
             i1 | o1: KC.LSFT,
             i1 | o1 | o4 : KC.NO,
             i1 | o1 | i4 : KC.LAYER1,
             i1 | o1 | o4 | i4 : KC.NO,
 
-            # ⬦⬦⬦⬦◆
+            # ⬦⬦⬦⬦◆ ┊Left GUI┊      ┊none┊ ┊Layer 0┊
             i0 | o0: KC.LGUI,
             i0 | o0 | o4 : KC.NO,
             i0 | o0 | i4 : KC.LAYER0,
