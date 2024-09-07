@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: © 2024 Kelvin Afolabi @glodigit
 
 from micropython import const
-from kmk.keys import Key, KC, make_argumented_key, make_key
+from kmk.keys import Key, KC, make_key
 from kmk.modules import Module
 from kmk.utils import Debug
 from supervisor import ticks_ms
@@ -100,7 +100,7 @@ class State:
         self.hold_handled = False
     
 class Taipo(Module):
-    def __init__(self, tap_timeout=150, sticky_timeout=1000):
+    def __init__(self, tap_timeout=500, sticky_timeout=1500):
         self.tap_timeout = tap_timeout
         self.sticky_timeout=sticky_timeout
         self.state = [State(), State()]
@@ -112,8 +112,8 @@ class Taipo(Module):
                 code=code,
                 )
             
-
         # Outer Finger 4---0: ⬖⬘⬘⬘⬗
+        # English UK Layout
         self.keymap = {
             # ⬖⬦⬦⬦⬦ ┊backspace┊
             o4 : KC.BSPC,
@@ -124,10 +124,10 @@ class Taipo(Module):
             # ◆⬦⬦⬦⬦
             o4 | i4 : KC.NO,
 
-            # ⬦⬘⬦⬦⬦ ┊A┊ ┊}┊
-            o3 : KC.A,
-            o3 | o4 : KC.LSFT(KC.A),
-            o3 | i4 : KC.MACRO("a "),
+            # ⬦⬘⬦⬦⬦ ┊O┊ ┊}┊
+            o3 : KC.O,
+            o3 | o4 : KC.LSFT(KC.O),
+            o3 | i4 : KC.MACRO("o "),
             o3 | o4 | i4 : KC.RCBR,
 
             # ⬦⬦⬘⬦⬦ ┊N┊ ┊]┊
@@ -148,10 +148,10 @@ class Taipo(Module):
             o0 | i4 : KC.MACRO("s "),
             o0 | o4 | i4 : KC.RABK,
 
-            # ⬦⬙⬦⬦⬦ ┊O┊ ┊{┊
-            i3 : KC.O,   
-            i3 | o4 : KC.LSFT(KC.O), 
-            i3 | i4 : KC.MACRO("o "),   
+            # ⬦⬙⬦⬦⬦ ┊A┊ ┊{┊
+            i3 : KC.A,   
+            i3 | o4 : KC.LSFT(KC.A), 
+            i3 | i4 : KC.MACRO("a "),   
             i3 | o4 | i4 : KC.LCBR,
 
             # ⬦⬦⬙⬦⬦ ┊T┊ ┊[┊
@@ -259,7 +259,7 @@ class Taipo(Module):
             # ⬦⬘⬦⬦⬖ ┊'┊ ┊`┊ ┊"┊ ┊°┊
             o0 | o3 : KC.QUOTE,
             o0 | o3 | o4 : KC.GRAVE,
-            o0 | o3 | i4 : KC.DQUO, #KC.AT,
+            o0 | o3 | i4 : KC.AT, #KC.DQUO,
             o0 | o3 | o4 | i4 : KC.MACRO("°"),
 
             # ⬦⬙⬘⬦⬦ ┊_┊ ┊+┊ ┊-┊ ┊±┊
@@ -269,10 +269,10 @@ class Taipo(Module):
             o2 | i3 | o4 | i4 : KC.MACRO("±"),
 
             # ⬦⬙⬦⬘⬦ ┊|┊ ┊/┊ ┊\┊ ┊%┊
-            o1 | i3 : KC.PIPE,
-            o1 | i3 | o4 : KC.BSLS,
+            o1 | i3 : KC.LSFT(KC.NONUS_BSLASH), # KC.PIPE,
+            o1 | i3 | o4 : KC.NONUS_BSLASH, #KC.BSLS,
             o1 | i3 | i4 : KC.SLSH,
-            o1 | i3 | o4 | i4 : KC.PERC,
+            o1 | i3 | o4 | i4 : KC.PERC,            
 
             # ⬦⬙⬦⬦⬗ ┊,┊ ┊;┊ ┊.┊ ┊:┊
             o0 | i3 : KC.COMMA,
@@ -282,7 +282,7 @@ class Taipo(Module):
 
             # ⬦⬦⬘⬙⬦ ┊?┊ ┊@┊ ┊!┊ ┊&┊
             i1 | o2: KC.QUES,
-            i1 | o2 | o4 : KC.AT, #KC.DQUO,
+            i1 | o2 | o4 : KC.DQUO, # .AT,
             i1 | o2 | i4 : KC.EXCLAIM,
             i1 | o2 | o4 | i4 : KC.AMPERSAND,
 
@@ -334,8 +334,8 @@ class Taipo(Module):
             # ⬦⬙⬙⬙⬦ ┊enter┊ ┊none┊ ┊right alt┊ 
             i1 | i2 | i3: KC.ENTER,
             i1 | i2 | i3 | o4 : KC.NO,
-            i1 | i2 | i3 | i4 : KC.RALT,
-            i1 | i2 | i3 | o4 | i4 : KC.NO,
+            i1 | i2 | i3 | i4 : KC.RGUI,    # I remapped RALT to backspace 
+            i1 | i2 | i3 | o4 | i4 : KC.NO, # and RGUI to RALT
 
             # ⬦⬙⬙⬦⬖ ┊left┊ ┊none┊ ┊right┊ (topleft/bottomright)
             i0 | i2 | i3 : KC.LEFT,
@@ -348,8 +348,8 @@ class Taipo(Module):
             i0 | i1 | i3 : KC.ESC,
 
             # ⬦⬘⬙⬘⬦ ┊£┊ ┊€┊ ┊$┊  (mnemonic: v for value)
-            o1 | i2 | o3 : KC.MACRO("£"),
-            o1 | i2 | o3 | o4 : KC.MACRO("€"),
+            o1 | i2 | o3 : KC.HASH,
+            o1 | i2 | o3 | o4 : KC.RGUI(KC.N4), 
             o1 | i2 | o3 | i4 : KC.DOLLAR,
 
             # ⬦⬘⬙⬦⬗
@@ -408,8 +408,8 @@ class Taipo(Module):
             i0 | i1 | o2 : KC.INSERT,
 
             # ⬦⬙⬘⬘⬦ ┊#┊ ┊none┊ ┊#+space┊
-            o1 | o2 | i3 : KC.HASH,
-            o1 | o2 | i3 | i4 : KC.MACRO("# "),
+            o1 | o2 | i3 : KC.BSLS, #KC.HASH,
+            o1 | o2 | i3 | i4 : KC.MACRO(KC.BSLS, KC.SPC),
 
             # ⬦⬙⬘⬦⬗
 
@@ -578,24 +578,12 @@ class Taipo(Module):
 
     def on_powersave_disable(self, keyboard):
         pass
-
-    def _tp_pressed(self, key, *args, **kwargs):
-        side = 1 if key.code / 10 >= 1 else 0
-        if self.state[side].combo == 0: 
-            # This is the first press of a new combo
-            self.state[side].timer = ticks_add(ticks_ms(), self.tap_timeout)
-        self.state[side].combo |= 1 << (key.code % 10)
-    
-    def _tp_released(self, key, *args, **kwargs):
-        pass
-        #side = 1 if key.code / 10 >= 1 else 0
-        #self.state[side].combo &= ~(1 << (key.code % 10))
         
     def handle_key(self, keyboard, side):
         state = self.state[side]
         mods = []
 
-        if state.keycode in [ KC.LGUI, KC.LALT, KC.RALT, KC.LCTL, KC.LSFT ]:
+        if state.keycode in [ KC.LCTL, KC.LSFT, KC.LGUI, KC.LALT, KC.RALT, KC.RGUI ]:
             mods = [state.keycode]
         elif state.keycode == KC.MOD_GA:
             mods = [KC.LGUI, KC.LALT]
@@ -633,7 +621,10 @@ class Taipo(Module):
             if state.hold_handled:
                 keyboard.remove_key(state.keycode)
             elif state.hold:
-                keyboard.add_key(state.keycode)
+                if hasattr(state.keycode, 'blocking'): # Only KC.MACRO has this
+                    keyboard.tap_key(state.keycode)
+                else:
+                    keyboard.add_key(state.keycode)
                 state.hold_handled = True
             else:
                 keyboard.tap_key(state.keycode)
