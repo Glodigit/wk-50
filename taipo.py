@@ -1,4 +1,4 @@
-# Based on taipo.py from github.com/dlip/chouchou
+# Based on taipo.py from https://github.com/dlip/chouchou
 # SPDX-FileCopyrightText: © 2023 Dane Lipscombe @dlip
 # SPDX-FileCopyrightText: © 2024 Kelvin Afolabi @glodigit
 
