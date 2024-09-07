@@ -21,3 +21,4 @@ On keyboard:
     ⬖⬘⬘⬘
          ⬗
 ```
+Currently works on circuitpython 8.2.x but not 9.1.3 due to `MemoryError`.
