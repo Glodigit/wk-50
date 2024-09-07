@@ -96,11 +96,6 @@ class POGKeyboard(KMKKeyboard):
         # Add your own modules and extensions here
         # or sort them into the correct spot to have the correct import order
         
-         # Trackball
-        from adns5050 import ADNS5050
-        self.modules.append(ADNS5050(board.XY_NCS, board.XY_SCLK, board.XY_SDIO, 
-                                     north=-2, leftright=[18, 18]))
-        
         # Encoders
         if pog.hasEncoders:
             from kmk.modules.encoder import EncoderHandler
@@ -108,6 +103,7 @@ class POGKeyboard(KMKKeyboard):
             self.encoder_handler.pins = pog.encoders
             self.modules.append(self.encoder_handler)
 
+        # RGB
         if "rgb" in features:
             from kmk.extensions.RGB import RGB
             rgb = RGB(
@@ -121,9 +117,13 @@ class POGKeyboard(KMKKeyboard):
             )
             self.extensions.append(rgb)
 
+        # Trackball
+        from adns5050 import ADNS5050
+        self.modules.append(ADNS5050(board.XY_NCS, board.XY_SCLK, board.XY_SDIO, 
+                                     north=-2, leftright=[18, 18]))
         # Taipo
-        #from taipo import Taipo
-        #self.modules.append(Taipo())
+        from taipo import Taipo
+        self.modules.append(Taipo())
 
         # direct pin wiring
         # Must be set during init to override defaulting to matrix wiring
