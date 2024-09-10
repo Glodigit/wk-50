@@ -21,4 +21,4 @@ On keyboard:
     ⬖⬘⬘⬘
          ⬗
 ```
-Currently works on circuitpython 8.2.x but not 9.1.3 due to `MemoryError`.
+Currently works on circuitpython 8.2.x but not 9.1.3 due to `MemoryError`. Source code for both versions can be found [here](https://github.com/Glodigit/circuitpython/tree/wk-50).
