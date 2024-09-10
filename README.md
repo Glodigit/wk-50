@@ -1,6 +1,6 @@
 # KMK + Pog + Taipo for the Debroglie / Weekin WK-50 Trackball Keyboard
 KMK firmware files for the WK-50 I got from AliExpress.
-A modified version of Taipo is implemented to be able to have an ambidextrous keyboard and "16-button programmable" trackball.
+A modified version of Taipo is implemented to be able to have an ambidextrous keyboard and "16-button programmable" trackball on a single layer, which currently works on circuitpython 8.2.x but not 9.1.3 due to `MemoryError`. Source code and .uf2 for both versions can be found [here](https://github.com/Glodigit/circuitpython/tree/wk-50).
 
 # Setup
 Copy the files into CIRCUITPY after pog has installed KMK onto it. I'd recommend a diffchecker for files that are already on the keyboard to see if anything's changed since.
@@ -21,4 +21,4 @@ On keyboard:
     ⬖⬘⬘⬘
          ⬗
 ```
-Currently works on circuitpython 8.2.x but not 9.1.3 due to `MemoryError`. Source code for both versions can be found [here](https://github.com/Glodigit/circuitpython/tree/wk-50).
+
